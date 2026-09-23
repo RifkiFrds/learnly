@@ -1,0 +1,24 @@
+# Dev lokal saja: hanya MySQL. API & web dijalankan langsung dengan `npm run dev`.
+# Lihat docs/03-tech-stack.md — tidak ada Redis/queue/service lain.
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: learnly_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: learnly_root
+      MYSQL_DATABASE: learnly
+      # Dev pakai user root: `prisma migrate dev` butuh hak CREATE DATABASE untuk shadow database
+    ports:
+      # Host 3307 agar tidak bentrok dengan MySQL lokal yang mungkin sudah jalan di 3306
+      - "3307:3306"
+    volumes:
+      - learnly_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-plearnly_root"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  learnly_mysql_data:
