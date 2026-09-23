@@ -31,6 +31,10 @@ Terkait: [04-architecture.md](04-architecture.md)
 | Hosting FE | **Vercel** (free tier) | Native Next.js, auto-deploy dari GitHub |
 | Hosting BE + DB | **Railway** (free/trial tier) | Auto-deploy dari GitHub, MySQL managed tersedia satu klik |
 
+### 1.1 Versi yang Dipasang (Fase 0)
+
+Next.js 16 (App Router, Turbopack) · Tailwind CSS 4 (token tetap di `web/tailwind.config.ts`, dimuat via `@config` di `globals.css`) · shadcn/ui (primitives Radix) · TanStack Query 5 · Express 5 · Prisma 6 · Zod 4 · TypeScript 5.9. Prisma sengaja di-pin ke 6.x (stabil, tidak butuh driver adapter seperti v7+); TypeScript di-pin ke 5.x karena `typescript-eslint` belum mendukung TS 7. Upgrade major dilakukan sadar, bukan otomatis.
+
 ## 2. Detail Keputusan
 
 ### 2.1 Pembayaran Manual (QRIS + Upload Bukti)
@@ -82,6 +86,9 @@ learnly/
 
 | Variabel | Digunakan di | Keterangan |
 |---|---|---|
+| `NODE_ENV` | api | `development`/`production`/`test` (default `development`) |
+| `PORT` | api | port HTTP (default `4000`; di Railway di-inject otomatis) |
+| `CORS_ORIGIN` | api | origin FE yang diizinkan CORS, dipisah koma (URL Vercel di production) |
 | `DATABASE_URL` | api | koneksi MySQL Railway |
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | api | signing token |
 | `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | api | upload file |

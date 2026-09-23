@@ -37,10 +37,17 @@ Error:
 | 409 | `CONFLICT` | Mis. slot bentrok, sudah pernah review |
 | 422 | `BUSINESS_RULE_VIOLATION` | Mis. cancel window terlewati |
 | 500 | `INTERNAL_ERROR` | Kesalahan tak terduga |
+| 503 | `SERVICE_UNAVAILABLE` | Dependensi (mis. database) tidak dapat dihubungi |
 
 ### 1.3 Pagination Query Params
 
 `?page=1&limit=20&sort=-createdAt` (prefix `-` = descending).
+
+### 1.4 Health Check
+
+| Method | Path | Role | Deskripsi |
+|---|---|---|---|
+| GET | `/health` dan `/api/v1/health` | guest | Status API + koneksi DB (query `SELECT 1` sungguhan). Sukses: `{ "success": true, "data": { "status": "ok", "db": "connected" } }`. DB tidak terhubung: HTTP 503 `SERVICE_UNAVAILABLE`. Versi tanpa prefix dipakai healthcheck Railway. |
 
 ## 2. Auth (`/auth`) — lihat FR-AUTH-*
 

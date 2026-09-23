@@ -67,6 +67,7 @@ learnly/
 ├── api/                             # Express (Railway)
 │   ├── src/
 │   │   ├── modules/
+│   │   │   ├── health/              # GET /health (cek koneksi DB) — contoh pola layer
 │   │   │   ├── auth/
 │   │   │   ├── users/
 │   │   │   ├── tutors/

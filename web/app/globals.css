@@ -1,0 +1,82 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+/* Design tokens Learnly (warna, font, skala tipografi) — lihat docs/10-design-system.md §4 */
+@config '../tailwind.config.ts';
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Alias semantik yang dipakai primitives shadcn/ui (bg-primary, text-muted-foreground, ring, dst.).
+ * Nilainya WAJIB cermin dari token di tailwind.config.ts — bukan palet baru.
+ * Dark mode belum dalam scope (docs/10-design-system.md §9), jadi hanya light mode.
+ */
+@theme inline {
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.5);
+}
+
+:root {
+  --radius: 0.5rem; /* rounded-lg = 8px untuk card & input (§4.3) */
+  --background: #faf8f4; /* background */
+  --foreground: #231f1a; /* ink-900 */
+  --card: #ffffff; /* surface */
+  --card-foreground: #231f1a;
+  --popover: #ffffff;
+  --popover-foreground: #231f1a;
+  --primary: #c15f3c; /* primary-600 */
+  --primary-foreground: #ffffff;
+  --secondary: #f1ede5; /* surface-muted */
+  --secondary-foreground: #231f1a;
+  --muted: #f1ede5;
+  --muted-foreground: #7a7267; /* ink-500 */
+  --accent: #f1ede5;
+  --accent-foreground: #231f1a;
+  --destructive: #b3432b; /* danger-600 */
+  --input: #e4dfd5; /* border */
+  --ring: #c15f3c; /* focus ring primary-600 (§5, §7) */
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply bg-background;
+  }
+  body {
+    @apply bg-background font-sans text-body-md text-ink-700 antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-display text-ink-900;
+  }
+  h4,
+  h5,
+  h6 {
+    @apply font-sans text-ink-900;
+  }
+  ::selection {
+    @apply bg-primary-100 text-ink-900;
+  }
+}

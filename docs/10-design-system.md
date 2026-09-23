@@ -194,5 +194,8 @@ Ringkas — detail interaksi mengikuti alur di [07-ssd.md](07-ssd.md); ini fokus
 
 - Font di-load via `next/font/google` (Fraunces, Plus Jakarta Sans, JetBrains Mono) — bukan `<link>` manual, agar tidak ada layout shift.
 - Semua token warna & tipografi di §4 didefinisikan **sekali** di `tailwind.config.ts` dan `globals.css` (CSS variables) — komponen tidak boleh hardcode hex/px di luar token ini.
+  - Tailwind 4 memuat `tailwind.config.ts` lewat `@config` di `app/globals.css`.
+  - Alias semantik shadcn/ui (`--primary`, `--muted-foreground`, `--ring`, dst.) di `globals.css` **hanya cermin** token §4.1 (mis. `--primary` = `primary-600`), bukan palet tambahan. Jika token berubah, ubah keduanya.
+  - Komponen shadcn/ui di `web/components/ui/` sudah di-restyle sesuai §5 (Button, Badge status, Input).
 - Sebelum menambah komponen baru, cek dulu apakah shadcn/ui sudah punya primitive-nya (lihat [09-coding-standards.md](09-coding-standards.md) §8) — desain ulang tampilannya sesuai §5, jangan bikin dari nol.
 - Dark mode **tidak** menjadi kebutuhan wajib rilis awal (di luar scope [01-prd.md](01-prd.md)) — token warna di atas cukup didefinisikan untuk light mode.
