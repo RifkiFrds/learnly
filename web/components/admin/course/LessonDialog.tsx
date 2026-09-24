@@ -57,6 +57,7 @@ export function LessonDialog({
   const [title, setTitle] = useState(lesson?.title ?? '');
   const [contentUrl, setContentUrl] = useState(lesson?.contentUrl ?? '');
   const [contentBody, setContentBody] = useState(lesson?.contentBody ?? '');
+  const [attachmentUrl, setAttachmentUrl] = useState(lesson?.type === 'article' ? (lesson.contentUrl ?? '') : '');
   const [minutes, setMinutes] = useState(lesson?.durationSeconds ? String(Math.round(lesson.durationSeconds / 60)) : '');
   const [questions, setQuestions] = useState<QuestionDraft[]>(
     lesson?.questions?.map((q) => ({ questionText: q.questionText, options: q.options.map((o) => ({ optionText: o.optionText, isCorrect: Boolean(o.isCorrect) })) })) ?? [emptyQuestion()],
@@ -74,6 +75,13 @@ export function LessonDialog({
         new URL(contentUrl);
       } catch {
         next.contentUrl = 'Masukkan URL video lengkap (YouTube, Vimeo, atau file .mp4)';
+      }
+    }
+    if (type === 'article' && attachmentUrl.trim()) {
+      try {
+        new URL(attachmentUrl);
+      } catch {
+        next.attachmentUrl = 'Masukkan URL lengkap berkas PDF (https://…)';
       }
     }
     if ((type === 'article' || type === 'assignment') && contentBody.trim().length < 1) {
@@ -98,6 +106,8 @@ export function LessonDialog({
       type,
       ...(type === 'video' ? { contentUrl: contentUrl.trim(), ...(minutes ? { durationSeconds: Number(minutes) * 60 } : {}) } : {}),
       ...(type === 'article' || type === 'assignment' ? { contentBody: contentBody.trim() } : {}),
+      // lampiran PDF bacaan ikut dikirim agar tidak hilang saat lesson diedit
+      ...(type === 'article' && attachmentUrl.trim() ? { contentUrl: attachmentUrl.trim() } : {}),
       // soal lama dipertahankan bila tidak diubah (soal yang sudah dikerjakan peserta tidak bisa diganti)
       ...(type === 'quiz' && (!lesson || JSON.stringify(questions) !== originalQuestions) ? { questions: questions.map((q) => ({ questionText: q.questionText.trim(), options: q.options.map((o) => ({ optionText: o.optionText.trim(), isCorrect: o.isCorrect })) })) } : {}),
     };
@@ -159,6 +169,16 @@ export function LessonDialog({
               <Label htmlFor={`${id}-body`} className="text-body-sm font-semibold text-ink-900">{type === 'article' ? 'Isi bacaan' : 'Instruksi tugas'}</Label>
               <Textarea id={`${id}-body`} rows={8} value={contentBody} onChange={(e) => setContentBody(e.target.value)} aria-invalid={Boolean(errors.contentBody)} placeholder={type === 'assignment' ? 'Mis. Kerjakan 5 soal cerita di bawah, foto hasilnya, lalu unggah sebagai PDF/JPG.' : undefined} />
               {errors.contentBody && <p className="text-body-sm text-danger-600" role="alert">{errors.contentBody}</p>}
+            </div>
+          )}
+
+          {type === 'article' && (
+            <div className="space-y-1.5">
+              <Label htmlFor={`${id}-pdf`} className="text-body-sm font-semibold text-ink-900">
+                URL lampiran PDF <span className="font-normal text-ink-500">(opsional)</span>
+              </Label>
+              <Input id={`${id}-pdf`} type="url" placeholder="https://…/materi.pdf" value={attachmentUrl} onChange={(e) => setAttachmentUrl(e.target.value)} aria-invalid={Boolean(errors.attachmentUrl)} />
+              {errors.attachmentUrl && <p className="text-body-sm text-danger-600" role="alert">{errors.attachmentUrl}</p>}
             </div>
           )}
 

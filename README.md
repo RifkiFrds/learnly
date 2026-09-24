@@ -61,7 +61,10 @@ Semua env var divalidasi saat startup (`src/config/env.ts`); API langsung berhen
 | `npm run dev` | Dev server dengan hot reload (tsx watch) |
 | `npm run build` | `prisma generate` + compile TypeScript ke `dist/` |
 | `npm run start` | `prisma migrate deploy` + seed (idempotent) + jalankan `dist/server.js` (dipakai Railway) |
-| `npm run db:seed` | Seed admin (`admin@learnly.id` / `AdminLearnly#2026` di dev), master data, pengaturan, data demo |
+| `npm run db:seed` | Seed dasar: admin operator (`admin@learnly.id` / `AdminLearnly#2026` di dev), master data, pengaturan |
+| `npm run db:reset:demo` | **Kosongkan semua tabel + file unggahan lokal**, lalu isi data dasar + data demo lengkap (lihat bagian Data demo) |
+| `npm run db:seed:demo` | Tambah/timpa data demo saja (akun `@demo.learnly.id` & kursus demo dibuat ulang, data lain tidak disentuh) |
+| `npm run demo:assets` | Buat ulang aset dummy di `api/seed-assets/` dari `src/scripts/demo/data.ts` |
 | `npm test` | Unit test (Vitest): state machine booking, biaya, verifikasi pembayaran, progres kursus, slot |
 | `npm run postman:test` | Jalankan skenario end-to-end Postman dengan newman (API lokal harus menyala) |
 | `npm run postman:build` / `postman:examples` | Generate ulang collection & environment (+ sisipkan contoh response dari run terakhir) |
@@ -81,7 +84,18 @@ npm run dev                 # http://localhost:3000
 
 Scripts: `dev`, `build`, `start`, `lint`, `typecheck`, `format`. Jalankan API lebih dulu — seluruh data (termasuk landing page) diambil dari API.
 
-**Akun demo** (dibuat oleh seed API): admin `admin@learnly.id` / `AdminLearnly#2026`, tutor `demo.tutor.budi@learnly.id` · `demo.tutor.dewi@learnly.id` · `demo.tutor.fajar@learnly.id` / `DemoLearnly123`. Siswa/orang tua: daftar sendiri di `/daftar`. Di mode development, halaman masuk menampilkan daftar akun demo, dan lupa password / verifikasi email menampilkan tautan langsung (tanpa email).
+**Data demo** — jalankan `npm run db:reset:demo` di `api/` (menghapus semua data lama!). Isinya: 15 tutor di 7 kota (12 terverifikasi, 2 menunggu verifikasi, 1 ditolak), 4 orang tua dengan 8 anak, 3 siswa mandiri, 10 kursus (7 terbit, 1 direview, 2 draf — salah satunya pernah dikembalikan reviewer), 25 booking di semua status, pembayaran menunggu verifikasi/lunas/ditolak/dikembalikan, laporan perkembangan, ulasan + balasan, dan sertifikat. Tanggal relatif terhadap waktu reset, jadi jalankan ulang sesaat sebelum demo. Aset (sampul kursus, dokumen tutor, struk, QRIS contoh, materi PDF) berasal dari `api/seed-assets/` — semuanya buatan skrip, bertanda DEMO/CONTOH. Tidak ada lesson video karena ffmpeg tidak tersedia saat aset dibuat.
+
+| Peran | Email | Keterangan |
+|---|---|---|
+| Orang tua | `sari@demo.learnly.id` | 2 anak (SMA & SMP), booking di berbagai status, kursus berjalan |
+| Orang tua | `bambang@demo.learnly.id`, `dewi@demo.learnly.id`, `agus@demo.learnly.id` | Bandung, Surabaya, Yogyakarta |
+| Siswa | `putri@demo.learnly.id` (mahasiswa), `arif@demo.learnly.id` (SMA), `clara@demo.learnly.id` (umum) | |
+| Tutor | `rizky@demo.learnly.id` (+ `anisa`, `dimasadi`, `siti`, `galih`, `maya`, `hendra`, `laras`, `yoga`, `rina`, `andreas`, `putu`) | terverifikasi |
+| Tutor | `fitri@`, `kevin@` (menunggu verifikasi), `nuraini@` (ditolak) | domain `demo.learnly.id` |
+| Admin | `admin@demo.learnly.id` | antrian pembayaran, tutor, kursus, dan dispute sudah terisi |
+
+Password semua akun demo: **`Demo#2026`**. Akun admin operator dari seed dasar (`admin@learnly.id`) tetap ada. Di server Railway, data demo hanya bisa diisi dengan `ALLOW_DEMO_SEED=true` (`node dist/scripts/demo-seed.js --reset`). Di mode development, halaman masuk menampilkan daftar akun demo, dan lupa password / verifikasi email menampilkan tautan langsung (tanpa email).
 
 **Halaman per peran** (route group App Router, guard per layout — belum login → `/masuk?next=…`, peran salah → halaman 403):
 
@@ -118,6 +132,7 @@ Catatan teknis web:
 | `MAIL_DRIVER` | api | `log` (dev, email dicetak ke console) atau `smtp` (Gmail) |
 | `GMAIL_USER`, `GMAIL_APP_PASSWORD` | api | Wajib jika `MAIL_DRIVER=smtp` |
 | `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD` | api | Akun admin pertama (password wajib di production) |
+| `ALLOW_DEMO_SEED` | api | Isi `true` hanya bila ingin mengisi data demo di server production (mis. untuk presentasi); tanpa itu `demo-seed` menolak jalan |
 | `NEXT_PUBLIC_API_BASE_URL` | web | Base URL API yang dipanggil browser. Default & disarankan: `/api/v1` (relatif, lewat proxy same-origin) |
 | `API_PROXY_TARGET` | web | **Server-side** (bukan `NEXT_PUBLIC`): origin API tujuan rewrite `/api/v1/*` & `/uploads/*`, mis. `http://localhost:4000` (dev) atau `https://<domain-railway>` (Vercel). Wajib saat build & runtime bila base URL relatif |
 | `NEXT_PUBLIC_MAP_TILE_URL` | web | Tile OpenStreetMap untuk Leaflet |

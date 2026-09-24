@@ -238,13 +238,6 @@ const { data } = useQuery({
 
 **Link di email (reset password/verifikasi) tidak pernah datang di server lokal?** Server lokal tidak mengirim email sungguhan. Tokennya dikembalikan di response (`devResetToken`, `devEmailVerificationToken`) dan isi email tercetak di terminal API.
 
-**Akun untuk dicoba langsung (server lokal, setelah `npm run db:seed`)?**
-
-| Akun                       | Email                                                                                     | Password            |
-| -------------------------- | ----------------------------------------------------------------------------------------- | ------------------- |
-| Admin                      | `admin@learnly.id`                                                                        | `AdminLearnly#2026` |
-| Tutor demo (terverifikasi) | `demo.tutor.budi@learnly.id`, `demo.tutor.dewi@learnly.id`, `demo.tutor.fajar@learnly.id` | `DemoLearnly123`    |
-
-Ada juga dua kursus demo yang sudah terbit (satu gratis, satu berbayar).
+**Akun untuk dicoba langsung (server lokal)?** Setelah `npm run db:seed`: admin `admin@learnly.id` / `AdminLearnly#2026`. Untuk data lengkap (tutor, keluarga, kursus, transaksi di semua status) jalankan `npm run db:reset:demo` — semua akun demo `<nama>@demo.learnly.id` berpassword `Demo#2026` (mis. `sari@`, `putri@`, `rizky@`, `admin@`). Skenario Postman membuat datanya sendiri, jadi tetap berjalan dengan atau tanpa data demo.
 
 **Butuh endpoint yang belum ada?** Kabari tim backend. Kontrak resmi ada di `docs/06-api-spec.md`, dan koleksi ini dibuat otomatis dari kode, jadi selalu sinkron dengan API yang berjalan.

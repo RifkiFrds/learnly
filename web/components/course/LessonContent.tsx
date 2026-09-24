@@ -63,9 +63,21 @@ function VideoLesson({ lesson }: { lesson: Lesson }) {
 
 function ArticleLesson({ lesson }: { lesson: Lesson }) {
   return (
-    <article className="max-w-prose space-y-4 text-body-lg whitespace-pre-line text-ink-900">
-      {lesson.contentBody ?? 'Materi bacaan belum tersedia.'}
-    </article>
+    <div className="space-y-5">
+      <article className="max-w-prose space-y-4 text-body-lg whitespace-pre-line text-ink-900">
+        {lesson.contentBody ?? 'Materi bacaan belum tersedia.'}
+      </article>
+      {lesson.contentUrl && (
+        <a
+          href={lesson.contentUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border bg-surface px-4 text-body-sm font-semibold text-ink-900 hover:border-primary-600"
+        >
+          <FileText className="size-4 text-primary-600" aria-hidden /> Unduh materi (PDF)
+        </a>
+      )}
+    </div>
   );
 }
 

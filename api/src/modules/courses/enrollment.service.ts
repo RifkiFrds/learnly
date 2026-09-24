@@ -123,7 +123,7 @@ async function loadOwned(viewer: Viewer, enrollmentId: bigint) {
  * Hitung ulang progres, tandai selesai, dan terbitkan sertifikat PDF secara synchronous
  * begitu syarat FR-COURSE-07 terpenuhi. Idempotent — aman dipanggil berulang.
  */
-async function refreshProgress(enrollmentId: bigint) {
+export async function refreshProgress(enrollmentId: bigint) {
   const settings = await settingsService.get();
   const enrollment = (await enrollmentRepository.findById(prisma, enrollmentId))!;
   const result = evaluate(enrollment, settings.defaultPassingGrade);

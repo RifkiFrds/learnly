@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1080" viewBox="0 0 720 1080" role="img" aria-label="Struk transfer contoh">
+  <rect width="720" height="1080" fill="#F1EDE5"/>
+  <rect x="40" y="40" width="640" height="1000" rx="28" fill="#FFFFFF" stroke="#E4DFD5" stroke-width="2"/>
+  <circle cx="360" cy="170" r="54" fill="#E1EBE3"/>
+  <path d="M332 170 l20 20 l38 -40" fill="none" stroke="#4A7C59" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="360" y="275" text-anchor="middle" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="30" font-weight="700" fill="#231F1A">Transfer Berhasil</text>
+  <text x="360" y="340" text-anchor="middle" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="54" font-weight="800" fill="#231F1A">Rp190.000</text>
+  <line x1="90" y1="390" x2="630" y2="390" stroke="#E4DFD5" stroke-width="2" stroke-dasharray="10 8"/>
+  <text x="90" y="450" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="22" fill="#7A7267">Waktu</text>
+  <text x="630" y="450" text-anchor="end" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="24" font-weight="600" fill="#231F1A">19.42 WIB</text>
+  <text x="90" y="520" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="22" fill="#7A7267">Rekening tujuan</text>
+  <text x="630" y="520" text-anchor="end" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="24" font-weight="600" fill="#231F1A">BCA 1234567890</text>
+  <text x="90" y="590" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="22" fill="#7A7267">Nama penerima</text>
+  <text x="630" y="590" text-anchor="end" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="24" font-weight="600" fill="#231F1A">PT Learnly Demo</text>
+  <text x="90" y="660" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="22" fill="#7A7267">Pengirim</text>
+  <text x="630" y="660" text-anchor="end" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="24" font-weight="600" fill="#231F1A">Agus Hermawan</text>
+  <text x="90" y="730" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="22" fill="#7A7267">Berita</text>
+  <text x="630" y="730" text-anchor="end" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="24" font-weight="600" fill="#231F1A">Les privat Fajar</text>
+  <text x="90" y="800" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="22" fill="#7A7267">No. referensi</text>
+  <text x="630" y="800" text-anchor="end" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="24" font-weight="600" fill="#231F1A">DEMO-B17</text>
+  <text x="360" y="935" text-anchor="middle" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="20" fill="#7A7267">Struk contoh untuk demo aplikasi Learnly — bukan bukti transaksi asli.</text>
+  <text x="360" y="640" text-anchor="middle" transform="rotate(-28 360 640)" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="170" font-weight="800" fill="#C15F3C" fill-opacity="0.13">DEMO</text>
+</svg>

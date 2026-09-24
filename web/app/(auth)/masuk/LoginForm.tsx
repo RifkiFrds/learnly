@@ -83,10 +83,13 @@ export function LoginForm() {
 
       {process.env.NODE_ENV !== 'production' && (
         <details className="mt-6 rounded-lg bg-surface-muted px-4 py-3 text-body-sm text-ink-700">
-          <summary className="cursor-pointer font-semibold">Akun contoh (server lokal)</summary>
+          <summary className="cursor-pointer font-semibold">Akun demo (server lokal, setelah npm run db:reset:demo)</summary>
           <ul className="mt-2 space-y-1 font-mono text-[0.8125rem]">
-            <li>admin@learnly.id · AdminLearnly#2026</li>
-            <li>demo.tutor.budi@learnly.id · DemoLearnly123</li>
+            <li>Password semua akun: Demo#2026</li>
+            <li>Orang tua: sari@demo.learnly.id</li>
+            <li>Siswa: putri@demo.learnly.id</li>
+            <li>Tutor: rizky@demo.learnly.id</li>
+            <li>Admin: admin@demo.learnly.id</li>
           </ul>
         </details>
       )}

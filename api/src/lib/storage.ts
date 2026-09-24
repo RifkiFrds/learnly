@@ -31,6 +31,8 @@ const EXTENSIONS: Record<string, string> = {
   'image/jpeg': 'jpg',
   'image/webp': 'webp',
   'application/pdf': 'pdf',
+  // hanya dipakai seeder demo (sampul/struk/QRIS SVG buatan sendiri); unggahan pengguna tetap divalidasi magic bytes
+  'image/svg+xml': 'svg',
 };
 
 export async function uploadFile(

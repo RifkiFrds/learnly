@@ -92,6 +92,7 @@ learnly/
 | `PORT` | api | port HTTP (default `4000`; di Railway di-inject otomatis) |
 | `CORS_ORIGIN` | api | origin FE yang diizinkan CORS, dipisah koma (URL Vercel di production) |
 | `COOKIE_SAME_SITE` | api | SameSite cookie refresh token: `lax` (default, via proxy) / `none` (lintas domain langsung) |
+| `ALLOW_DEMO_SEED` | api | `true` hanya bila data demo boleh diisi di production (`demo-seed` menolak tanpa ini) |
 | `TRUST_PROXY_HOPS` | api | jumlah proxy di depan API (`2` = Vercel → Railway) agar rate limit melihat IP asli |
 | `DATABASE_URL` | api | koneksi MySQL Railway |
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | api | signing token |
