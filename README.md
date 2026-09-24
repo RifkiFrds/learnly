@@ -6,7 +6,9 @@ Platform edtech yang mengintegrasikan kursus online, tutor online, dan tutor tat
 
 Repo ini berisi **dokumentasi perencanaan lengkap** di `docs/` (PRD → SRS → tech stack → arsitektur → ERD → API spec → SSD → roadmap → coding standards → design system) dan kode aplikasi di `web/` (Next.js) + `api/` (Express).
 
-**Status:** Fase 0 selesai; **Track A — Backend (Fase B1–B8) selesai** secara lokal: seluruh endpoint [docs/06-api-spec.md](docs/06-api-spec.md) + Postman collection & panduan FE ([api/POSTMAN_GUIDE.md](api/POSTMAN_GUIDE.md)). Berikutnya: deploy Railway, lalu Track B — Frontend ([docs/08-roadmap.md](docs/08-roadmap.md)).
+**Status:** Fase 0, **Track A — Backend** (seluruh endpoint [docs/06-api-spec.md](docs/06-api-spec.md) + Postman collection, [api/POSTMAN_GUIDE.md](api/POSTMAN_GUIDE.md)), dan **Track B — Frontend** selesai secara lokal, lengkap dengan data demo. Berikutnya: deploy Vercel + Railway ([docs/08-roadmap.md](docs/08-roadmap.md)).
+
+📘 **Buku panduan pengguna** (siswa, orang tua, tutor, admin — bergambar, plus PDF): [docs/manual-book/](docs/manual-book/README.md).
 
 ## Getting Started
 
@@ -84,7 +86,7 @@ npm run dev                 # http://localhost:3000
 
 Scripts: `dev`, `build`, `start`, `lint`, `typecheck`, `format`. Jalankan API lebih dulu — seluruh data (termasuk landing page) diambil dari API.
 
-**Data demo** — jalankan `npm run db:reset:demo` di `api/` (menghapus semua data lama!). Isinya: 15 tutor di 7 kota (12 terverifikasi, 2 menunggu verifikasi, 1 ditolak), 4 orang tua dengan 8 anak, 3 siswa mandiri, 10 kursus (7 terbit, 1 direview, 2 draf — salah satunya pernah dikembalikan reviewer), 25 booking di semua status, pembayaran menunggu verifikasi/lunas/ditolak/dikembalikan, laporan perkembangan, ulasan + balasan, dan sertifikat. Tanggal relatif terhadap waktu reset, jadi jalankan ulang sesaat sebelum demo. Aset (sampul kursus, dokumen tutor, struk, QRIS contoh, materi PDF) berasal dari `api/seed-assets/` — semuanya buatan skrip, bertanda DEMO/CONTOH. Tidak ada lesson video karena ffmpeg tidak tersedia saat aset dibuat.
+**Data demo** — jalankan `npm run db:reset:demo` di `api/` (menghapus semua data lama!). Isinya: 15 tutor di 7 kota (12 terverifikasi, 2 menunggu verifikasi, 1 ditolak), 4 orang tua dengan 8 anak, 3 siswa mandiri, 10 kursus (7 terbit, 1 direview, 2 draf — salah satunya pernah dikembalikan reviewer), 25 booking di semua status, pembayaran menunggu verifikasi/lunas/ditolak/dikembalikan, laporan perkembangan, ulasan + balasan, dan sertifikat. Tanggal relatif terhadap waktu reset, jadi jalankan ulang sesaat sebelum demo. Akun demo & cara pemakaian per peran ada di [buku panduan](docs/manual-book/README.md). Aset (sampul kursus, dokumen tutor, struk, QRIS contoh, materi PDF) berasal dari `api/seed-assets/` — semuanya buatan skrip, bertanda DEMO/CONTOH. Tidak ada lesson video karena ffmpeg tidak tersedia saat aset dibuat.
 
 | Peran | Email | Keterangan |
 |---|---|---|
@@ -177,6 +179,7 @@ Import `api/postman/learnly.postman_collection.json` + `api/postman/learnly-loca
 | [docs/08-roadmap.md](docs/08-roadmap.md) | Urutan eksekusi pembangunan |
 | [docs/09-coding-standards.md](docs/09-coding-standards.md) | Konvensi kode, git workflow |
 | [docs/10-design-system.md](docs/10-design-system.md) | Design system & UI/UX guideline |
+| [docs/manual-book/](docs/manual-book/README.md) | Buku panduan pengguna per peran (+ versi PDF) |
 
 ## Tech Stack (ringkas)
 
