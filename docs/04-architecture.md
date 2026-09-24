@@ -79,7 +79,10 @@ learnly/
 │   │   │   ├── reports/
 │   │   │   ├── payments/            # upload bukti + verifikasi admin (manual)
 │   │   │   ├── reviews/
-│   │   │   └── admin/
+│   │   │   ├── admin/               # + master data, dashboard, dispute
+│   │   │   ├── notifications/       # notifikasi in-app (dibaca via polling)
+│   │   │   └── settings/            # platform_settings (biaya layanan, window, QRIS)
+│   │   ├── scripts/                 # seed (dijalankan otomatis oleh `npm start`)
 │   │   ├── middlewares/             # auth.middleware, rbac.middleware, error-handler
 │   │   ├── lib/                     # prisma client, cloudinary client, mailer, pdf generator
 │   │   ├── config/                  # env loader & validation

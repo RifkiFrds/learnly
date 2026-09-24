@@ -121,6 +121,7 @@ enum PaymentStatus {
   paid
   ditolak
   expired
+  refunded
 }
 
 enum ReviewableType {
@@ -264,6 +265,8 @@ model TutorProfile {
   teachingMode            TeachingMode            @default(online) @map("teaching_mode")
   verificationStatus      TutorVerificationStatus @default(pending_verification) @map("verification_status")
   verificationNotes       String?                 @map("verification_notes") @db.VarChar(500)
+  /// FR-BOOK-04: booking baru langsung diterima tanpa menunggu respons tutor
+  autoAccept              Boolean                 @default(false) @map("auto_accept")
   avgRating               Decimal                 @default(0) @map("avg_rating") @db.Decimal(3, 2)
   reviewCount             Int                     @default(0) @map("review_count") @db.UnsignedInt
   createdAt               DateTime                @default(now()) @map("created_at") @db.DateTime(0)
@@ -631,6 +634,10 @@ model Payment {
   verifiedAt       DateTime?     @map("verified_at") @db.DateTime(0)
   rejectionReason  String?       @map("rejection_reason") @db.VarChar(500)
   paidAt           DateTime?     @map("paid_at") @db.DateTime(0)
+  /// Nominal refund yang harus dikembalikan admin (dihitung saat pembatalan, FR-PAY-06)
+  refundAmount     Decimal?      @map("refund_amount") @db.Decimal(12, 2)
+  refundNote       String?       @map("refund_note") @db.VarChar(500)
+  refundedAt       DateTime?     @map("refunded_at") @db.DateTime(0)
   createdAt        DateTime      @default(now()) @map("created_at") @db.DateTime(0)
   updatedAt        DateTime      @default(now()) @updatedAt @map("updated_at") @db.DateTime(0)
 

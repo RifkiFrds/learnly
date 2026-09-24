@@ -35,6 +35,8 @@ Terkait: [04-architecture.md](04-architecture.md)
 
 Next.js 16 (App Router, Turbopack) · Tailwind CSS 4 (token tetap di `web/tailwind.config.ts`, dimuat via `@config` di `globals.css`) · shadcn/ui (primitives Radix) · TanStack Query 5 · Express 5 · Prisma 6 · Zod 4 · TypeScript 5.9. Prisma sengaja di-pin ke 6.x (stabil, tidak butuh driver adapter seperti v7+); TypeScript di-pin ke 5.x karena `typescript-eslint` belum mendukung TS 7. Upgrade major dilakukan sadar, bukan otomatis.
 
+Library backend Track A: `bcryptjs` (hash password), `jsonwebtoken` (JWT), `cookie-parser`, `multer` (upload), `cloudinary`, `nodemailer`, `pdf-lib` (sertifikat), `express-rate-limit` (store in-memory, tanpa Redis), `helmet`; test memakai `vitest`. Postman collection dijalankan otomatis dengan `newman` via `npx` (tidak masuk dependency).
+
 ## 2. Detail Keputusan
 
 ### 2.1 Pembayaran Manual (QRIS + Upload Bukti)
@@ -91,8 +93,13 @@ learnly/
 | `CORS_ORIGIN` | api | origin FE yang diizinkan CORS, dipisah koma (URL Vercel di production) |
 | `DATABASE_URL` | api | koneksi MySQL Railway |
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | api | signing token |
-| `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | api | upload file |
-| `GMAIL_USER`, `GMAIL_APP_PASSWORD` | api | kirim email reset password |
+| `API_PUBLIC_URL` | api | URL publik API (membentuk URL file saat `STORAGE_DRIVER=local`) |
+| `WEB_APP_URL` | api | URL web app untuk link reset password / verifikasi email |
+| `STORAGE_DRIVER` | api | `local` (dev, folder `api/uploads`) atau `cloudinary` (wajib di production — filesystem Railway tidak permanen) |
+| `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | api | upload file (wajib bila `STORAGE_DRIVER=cloudinary`) |
+| `MAIL_DRIVER` | api | `log` (dev, email dicetak ke console) atau `smtp` (Gmail) |
+| `GMAIL_USER`, `GMAIL_APP_PASSWORD` | api | kirim email reset password (wajib bila `MAIL_DRIVER=smtp`) |
+| `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD` | api | akun admin pertama yang dibuat seed (password wajib ≥ 12 karakter di production) |
 | `NEXT_PUBLIC_API_BASE_URL` | web | endpoint Express API (URL Railway) |
 | `NEXT_PUBLIC_MAP_TILE_URL` | web | tile OpenStreetMap |
 

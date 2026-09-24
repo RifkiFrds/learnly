@@ -9,8 +9,8 @@
   },
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "prisma generate && tsc",
-    "start": "prisma migrate deploy && node dist/server.js",
+    "build": "prisma generate && tsc -p tsconfig.build.json",
+    "start": "prisma migrate deploy && node dist/scripts/seed.js && node dist/server.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",
@@ -18,33 +18,56 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "db:seed": "prisma db seed",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "postman:build": "tsx postman/build-collection.ts",
+    "postman:test": "npm run postman:build && npx --yes newman@6 run postman/learnly.postman_collection.json -e postman/learnly-local.postman_environment.json --folder \"00 · Skenario End-to-End (jalankan dengan Collection Runner)\" --reporters cli,json --reporter-json-export postman/.newman-report.json",
+    "postman:examples": "tsx postman/build-collection.ts --examples postman/.newman-report.json"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.11.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.4.0",
+    "nodemailer": "^7.0.13",
+    "pdf-lib": "^1.17.1",
     "prisma": "^6.19.3",
     "zod": "^4.6.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
+    "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.2.0",
     "@types/node": "^22.20.4",
+    "@types/nodemailer": "^8.0.2",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.12.0",
     "prettier": "^3.9.9",
     "tsx": "^4.23.15",
     "typescript": "~5.9.3",
-    "typescript-eslint": "^8.70.1"
+    "typescript-eslint": "^8.70.1",
+    "vitest": "^5.0.1"
   },
   "allowScripts": {
     "@prisma/engines@6.19.3": true,
     "esbuild@0.28.2": true,
     "prisma@6.19.3": true,
     "@prisma/client@6.19.3": true
+  },
+  "prisma": {
+    "seed": "tsx src/scripts/seed.ts"
   }
 }

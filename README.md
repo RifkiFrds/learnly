@@ -6,7 +6,7 @@ Platform edtech yang mengintegrasikan kursus online, tutor online, dan tutor tat
 
 Repo ini berisi **dokumentasi perencanaan lengkap** di `docs/` (PRD → SRS → tech stack → arsitektur → ERD → API spec → SSD → roadmap → coding standards → design system) dan kode aplikasi di `web/` (Next.js) + `api/` (Express).
 
-**Status:** Fase 0 — Fondasi Proyek selesai. Berikutnya: Fase 1 — Auth, User, & RBAC ([docs/08-roadmap.md](docs/08-roadmap.md)).
+**Status:** Fase 0 selesai; **Track A — Backend (Fase B1–B8) selesai** secara lokal: seluruh endpoint [docs/06-api-spec.md](docs/06-api-spec.md) + Postman collection & panduan FE ([api/POSTMAN_GUIDE.md](api/POSTMAN_GUIDE.md)). Berikutnya: deploy Railway, lalu Track B — Frontend ([docs/08-roadmap.md](docs/08-roadmap.md)).
 
 ## Getting Started
 
@@ -42,6 +42,7 @@ cd api
 cp .env.example .env        # nilai default sudah cocok dengan docker-compose
 npm install
 npm run prisma:migrate      # terapkan migrasi ke MySQL lokal (+ generate Prisma Client)
+npm run db:seed             # admin, master data, pengaturan default + data demo (dev)
 npm run dev                 # http://localhost:4000
 ```
 
@@ -59,7 +60,11 @@ Semua env var divalidasi saat startup (`src/config/env.ts`); API langsung berhen
 |---|---|
 | `npm run dev` | Dev server dengan hot reload (tsx watch) |
 | `npm run build` | `prisma generate` + compile TypeScript ke `dist/` |
-| `npm run start` | `prisma migrate deploy` + jalankan `dist/server.js` (dipakai Railway) |
+| `npm run start` | `prisma migrate deploy` + seed (idempotent) + jalankan `dist/server.js` (dipakai Railway) |
+| `npm run db:seed` | Seed admin (`admin@learnly.id` / `AdminLearnly#2026` di dev), master data, pengaturan, data demo |
+| `npm test` | Unit test (Vitest): state machine booking, biaya, verifikasi pembayaran, progres kursus, slot |
+| `npm run postman:test` | Jalankan skenario end-to-end Postman dengan newman (API lokal harus menyala) |
+| `npm run postman:build` / `postman:examples` | Generate ulang collection & environment (+ sisipkan contoh response dari run terakhir) |
 | `npm run prisma:migrate` | Buat/terapkan migrasi baru saat dev (`prisma migrate dev`) |
 | `npm run prisma:generate` | Generate ulang Prisma Client |
 | `npm run prisma:studio` | GUI untuk melihat isi database |
@@ -89,20 +94,31 @@ Scripts: `dev`, `build`, `start`, `lint`, `typecheck`, `format`.
 | `CORS_ORIGIN` | api | Origin FE yang diizinkan, pisahkan koma (default `http://localhost:3000`) |
 | `DATABASE_URL` | api | Connection string `mysql://...` |
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | api | Minimal 32 karakter |
-| `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | api | Upload file (dipakai mulai Fase 2) |
-| `GMAIL_USER`, `GMAIL_APP_PASSWORD` | api | Email reset password (dipakai mulai Fase 1) |
+| `API_PUBLIC_URL`, `WEB_APP_URL` | api | URL publik API (untuk URL file lokal) & URL web app (untuk link di email) |
+| `STORAGE_DRIVER` | api | `local` (dev, folder `api/uploads`) atau `cloudinary` (production) |
+| `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | api | Wajib jika `STORAGE_DRIVER=cloudinary` |
+| `MAIL_DRIVER` | api | `log` (dev, email dicetak ke console) atau `smtp` (Gmail) |
+| `GMAIL_USER`, `GMAIL_APP_PASSWORD` | api | Wajib jika `MAIL_DRIVER=smtp` |
+| `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD` | api | Akun admin pertama (password wajib di production) |
 | `NEXT_PUBLIC_API_BASE_URL` | web | Base URL API **termasuk** `/api/v1` |
 | `NEXT_PUBLIC_MAP_TILE_URL` | web | Tile OpenStreetMap untuk Leaflet |
 
 `.env` / `.env.local` tidak pernah di-commit (lihat `.gitignore`); hanya `.env.example` yang masuk repo.
+
+### 4. Coba API lewat Postman
+
+Import `api/postman/learnly.postman_collection.json` + `api/postman/learnly-local.postman_environment.json`, lalu jalankan folder **00 · Skenario End-to-End** dengan Collection Runner. Panduan lengkap untuk tim FE: [api/POSTMAN_GUIDE.md](api/POSTMAN_GUIDE.md).
 
 ### Deploy (free tier)
 
 1. **Push** repo ke GitHub (branch `main`).
 2. **Railway** — New Project → Deploy from GitHub repo → set **Root Directory = `api`**. Tambahkan **MySQL** (New → Database → MySQL) di project yang sama. Di service `api`, set variables:
    - `DATABASE_URL` = `${{MySQL.MYSQL_URL}}` (reference variable dari plugin MySQL)
-   - `NODE_ENV=production`, `CORS_ORIGIN=<URL Vercel>`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `CLOUDINARY_*`, `GMAIL_*`
-   - Build/start/healthcheck sudah diatur di `api/railway.json` (`npm run build` → `npm run start`, yang otomatis menjalankan `prisma migrate deploy`). Lalu Settings → Networking → **Generate Domain**.
+   - `NODE_ENV=production`, `CORS_ORIGIN=<URL Vercel>`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` (acak, ≥ 32 karakter)
+   - `SEED_ADMIN_PASSWORD` (≥ 12 karakter) — dipakai membuat akun admin pertama
+   - `STORAGE_DRIVER=cloudinary` + `CLOUDINARY_*` (filesystem Railway tidak permanen); `MAIL_DRIVER=smtp` + `GMAIL_*` untuk email reset password (atau `MAIL_DRIVER=log` sementara)
+   - `API_PUBLIC_URL=https://<domain-railway>` dan `WEB_APP_URL=<URL Vercel>`
+   - Build/start/healthcheck sudah diatur di `api/railway.json` (`npm run build` → `npm run start`, yang otomatis menjalankan `prisma migrate deploy` + seed). Lalu Settings → Networking → **Generate Domain**.
 3. **Vercel** — Add New Project → import repo → set **Root Directory = `web`** (framework Next.js terdeteksi otomatis, tanpa config tambahan). Set env `NEXT_PUBLIC_API_BASE_URL=https://<domain-railway>/api/v1` dan `NEXT_PUBLIC_MAP_TILE_URL`.
 4. Kembali ke Railway, pastikan `CORS_ORIGIN` berisi domain Vercel final (mis. `https://learnly.vercel.app`), lalu buka landing page Vercel: badge harus hijau.
 

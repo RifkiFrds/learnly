@@ -1,6 +1,7 @@
 # Entity Relationship Diagram & Skema Database — Learnly
 
-Status: Draft v1.1 (skema `payments` disederhanakan menjadi verifikasi manual, lihat [03-tech-stack.md](03-tech-stack.md))
+Status: Draft v1.2 (Track A: + `payments.refunded`/kolom refund, + `tutor_profiles.auto_accept`)
+Sebelumnya: Draft v1.1 (skema `payments` disederhanakan menjadi verifikasi manual, lihat [03-tech-stack.md](03-tech-stack.md))
 Terkait: [02-srs.md](02-srs.md), [04-architecture.md](04-architecture.md)
 
 Database: **MySQL 8.x**. Skema di bawah adalah acuan untuk `prisma/schema.prisma`; DDL SQL disertakan sebagai referensi eksplisit yang tidak ambigu untuk implementasi.
@@ -171,6 +172,7 @@ CREATE TABLE tutor_profiles (
   teaching_mode         ENUM('online','tatap_muka','both') NOT NULL DEFAULT 'online',
   verification_status   ENUM('pending_verification','verified','rejected') NOT NULL DEFAULT 'pending_verification',
   verification_notes    VARCHAR(500) NULL,
+  auto_accept           BOOLEAN NOT NULL DEFAULT FALSE, -- FR-BOOK-04 mode auto-accept
   avg_rating            DECIMAL(3,2) NOT NULL DEFAULT 0,
   review_count          INT UNSIGNED NOT NULL DEFAULT 0,
   created_at            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -446,12 +448,15 @@ CREATE TABLE payments (
   amount                DECIMAL(12,2) NOT NULL,
   method                ENUM('qris','transfer_manual') NOT NULL DEFAULT 'qris',
   proof_image_url       VARCHAR(500) NULL,
-  status                ENUM('menunggu_pembayaran','menunggu_verifikasi','paid','ditolak','expired') NOT NULL DEFAULT 'menunggu_pembayaran',
+  status                ENUM('menunggu_pembayaran','menunggu_verifikasi','paid','ditolak','expired','refunded') NOT NULL DEFAULT 'menunggu_pembayaran',
   submitted_at          DATETIME NULL,
   verified_by_user_id   BIGINT UNSIGNED NULL,
   verified_at           DATETIME NULL,
   rejection_reason      VARCHAR(500) NULL,
   paid_at               DATETIME NULL,
+  refund_amount         DECIMAL(12,2) NULL,  -- nominal refund sesuai kebijakan pembatalan (FR-PAY-06)
+  refund_note           VARCHAR(500) NULL,   -- referensi transfer refund manual oleh admin
+  refunded_at           DATETIME NULL,
   created_at            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id),

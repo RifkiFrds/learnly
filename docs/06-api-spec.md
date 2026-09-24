@@ -36,6 +36,7 @@ Error:
 | 404 | `NOT_FOUND` | Resource tidak ditemukan |
 | 409 | `CONFLICT` | Mis. slot bentrok, sudah pernah review |
 | 422 | `BUSINESS_RULE_VIOLATION` | Mis. cancel window terlewati |
+| 429 | `TOO_MANY_REQUESTS` | Rate limit (login/lupa/reset password) terlampaui |
 | 500 | `INTERNAL_ERROR` | Kesalahan tak terduga |
 | 503 | `SERVICE_UNAVAILABLE` | Dependensi (mis. database) tidak dapat dihubungi |
 
@@ -43,7 +44,16 @@ Error:
 
 `?page=1&limit=20&sort=-createdAt` (prefix `-` = descending).
 
-### 1.4 Health Check
+### 1.4 Konvensi Data (implementasi)
+
+- ID (BIGINT) dan nominal uang (DECIMAL) dikirim sebagai **number** (mis. `"totalAmount": 160000`).
+- Timestamp dikirim ISO 8601 UTC (`2026-10-01T02:00:00.000Z`); input jadwal wajib menyertakan zona waktu (`2026-10-01T09:00:00+07:00`). Jadwal tutor & slot dinyatakan dalam WIB.
+- Kolom DATE (tanggal lahir, tanggal blokir, tanggal sertifikasi) dikirim sebagai string `YYYY-MM-DD`.
+- Upload file: `multipart/form-data` field `file` (web app) **atau** JSON `{ "fileBase64": "data:<mime>;base64,..." }` (Postman/klien API). Tipe file divalidasi dari isi file (magic bytes).
+- Detail booking & pembayaran menyertakan `polling: { shouldPoll, intervalSeconds }` dan (booking) `availableActions` sebagai petunjuk FE.
+- Koleksi Postman lengkap + panduan FE: `api/postman/` & `api/POSTMAN_GUIDE.md`.
+
+### 1.5 Health Check
 
 | Method | Path | Role | Deskripsi |
 |---|---|---|---|
@@ -62,6 +72,12 @@ Error:
 | POST | `/auth/reset-password` | guest | Set password baru via token |
 | GET | `/auth/me` | authenticated | Data profil user login |
 
+Catatan implementasi:
+- Register mengembalikan token (user langsung login). Role `student` otomatis punya learner `isSelf`; role `tutor` otomatis punya profil `pending_verification`. Admin dibuat lewat seed.
+- Refresh token dibaca dari cookie httpOnly `learnly_refresh_token` (path `/api/v1/auth`); body `refreshToken` diterima sebagai cadangan untuk klien non-browser. Refresh melakukan rotasi token.
+- Rate limit: login 10×/15 menit per IP+email; lupa password 5×/15 menit per IP+email; reset 5×/15 menit per IP+token.
+- Hanya di dev (`MAIL_DRIVER=log`): register mengembalikan `devEmailVerificationToken`, forgot-password mengembalikan `devResetToken`.
+
 ## 3. Users & Learners (`/users`, `/learners`) — FR-AUTH-06
 
 | Method | Path | Role | Deskripsi |
@@ -75,6 +91,7 @@ Error:
 | POST | `/addresses` | student, parent | Tambah alamat baru |
 | PATCH | `/addresses/:id` | owner | Edit alamat |
 | DELETE | `/addresses/:id` | owner | Hapus alamat |
+| GET | `/subjects`, `/education-levels`, `/categories` | public | Master data untuk dropdown filter (tambahan implementasi) |
 
 ## 4. Tutor Profile & Availability (`/tutors`) — FR-TUTOR-*
 
@@ -111,10 +128,13 @@ Error:
 | GET | `/bookings/:id/payment-info` | student, parent | Nominal tagihan + gambar QRIS/info rekening (lihat §9) |
 | PATCH | `/bookings/:id/status` | tutor | Update status perjalanan (`tutor_bersiap`, `tutor_dalam_perjalanan`, `tutor_tiba`) |
 | POST | `/bookings/:id/location-ping` | tutor | Kirim titik lokasi terkini (saat `tutor_dalam_perjalanan`) |
-| POST | `/bookings/:id/checkin` | tutor | Check-in (opsional `qrToken` untuk verifikasi tatap muka) |
+| POST | `/bookings/:id/checkin` | tutor | Check-in. Tatap muka: **wajib** `qrToken` dan status `tutor_tiba`; online: tanpa QR dari status `dikonfirmasi` |
 | GET | `/bookings/:id/qr-token` | student, parent | Generate/ambil QR token aktif untuk ditampilkan ke tutor |
 | POST | `/bookings/:id/checkout-session` | tutor | Check-out + submit laporan perkembangan (body = payload `progress_reports`) |
 | POST | `/bookings/:id/cancel` | pemilik terkait | Batalkan booking (`reason`) |
+| PATCH | `/bookings/:id/meeting-link` | tutor | Lampirkan link meeting sesi online (`meetingLink` https) — FR-ONLINE-02 (tambahan implementasi) |
+
+> Catatan implementasi: `learnerId` boleh dikosongkan oleh siswa mandiri (dipakai profil `isSelf`). Durasi 60–240 menit kelipatan 30, jam mulai :00/:30 WIB, harus di dalam jadwal tutor & wilayah layanan (tatap muka). Booking `pending_confirmation` > 24 jam dan tagihan tidak dibayar > 24 jam dibatalkan otomatis secara *lazy* saat endpoint booking/pembayaran diakses (tanpa cron/queue).
 
 > Catatan penamaan: `/bookings/:id/payment-info` (lihat tagihan & QRIS) vs `/bookings/:id/checkout-session` (mengakhiri sesi belajar, tutor check-out) sengaja dibedakan namanya untuk menghindari ambiguitas "pembayaran" vs "check-out sesi les". Pembayaran aktual dilakukan lewat modul `/payments` (§9) karena satu alur pembayaran dipakai bersama oleh booking dan enrollment kursus.
 
@@ -145,6 +165,12 @@ Error:
 | POST | `/lessons/:id/assignments` | pemilik enrollment | Upload tugas |
 | PATCH | `/assignments/:id/grade` | admin/instruktur | Beri nilai & feedback tugas |
 | GET | `/enrollments/:id/certificate` | pemilik | Unduh sertifikat (jika sudah terbit) |
+| PATCH | `/courses/:id/reject` | admin | `in_review` → `draft` dengan `notes` (FR-ADMIN-04, tambahan) |
+| GET | `/courses/:id/grades` | admin | Rekap nilai seluruh peserta (FR-EVAL-02, tambahan) |
+| GET | `/courses/:id/reviews` | public | Daftar review kursus |
+| GET | `/enrollments` | student, parent | Daftar kursus yang diikuti (tambahan) |
+
+> Catatan implementasi: `GET /courses/:slug` juga menerima ID numerik. Materi lengkap (konten & soal kuis tanpa kunci jawaban) disajikan di `GET /enrollments/:id` bila `hasAccess` (kursus gratis atau pembayaran `paid`). Endpoint lesson menerima `enrollmentId` opsional (wajib bila orang tua mendaftarkan >1 anak ke kursus yang sama).
 
 ## 9. Pembayaran Manual (`/payments`) — FR-PAY-*
 
@@ -156,6 +182,9 @@ Error:
 | GET | `/admin/payments?status=menunggu_verifikasi` | admin | Antrian pembayaran yang perlu diverifikasi |
 | PATCH | `/admin/payments/:id/verify` | admin | `{ action: "approve" \| "reject", rejectionReason? }` → `paid` (lanjutkan booking/enrollment) atau `ditolak` |
 | GET | `/tutors/me/earnings` | tutor | Ringkasan pendapatan per periode (dihitung dari `payments.status = paid`) |
+| PATCH | `/admin/payments/:id/refund` | admin | Catat refund manual (`note`, `refundAmount?`) → status `refunded` (FR-PAY-06, tambahan) |
+
+> Catatan implementasi: approve/reject idempotent (mengulang aksi yang sama mengembalikan `alreadyProcessed: true`). Reject pembayaran booking otomatis membatalkan booking (FR-PAY-04). Status pembayaran bertambah `refunded`.
 
 > Tidak ada endpoint webhook — seluruh perubahan status pembayaran dipicu aksi manusia (user upload bukti, admin approve/reject), sesuai [03-tech-stack.md](03-tech-stack.md) §2.1.
 
@@ -189,6 +218,12 @@ Error:
 | GET | `/admin/dashboard/summary` | admin | Ringkasan KPI (booking, GMV, tutor aktif) |
 | GET | `/admin/disputes` | admin | Daftar booking/pembayaran bermasalah |
 | PATCH | `/admin/settings` | admin | Update `platform_settings` (service fee %, cancel window, dsb.) |
+| GET | `/admin/settings` | admin | Lihat pengaturan (tambahan) |
+| POST | `/admin/settings/qris-image` | admin | Upload gambar QRIS statis (tambahan) |
+| PATCH | `/admin/bookings/:id/status` | admin | Override status booking untuk dispute (`status`, `reason`) — FR-ADMIN-06 (tambahan) |
+| PATCH | `/admin/reviews/:id/visibility` | admin | Sembunyikan/tampilkan review (`isHidden`) — FR-REVIEW-05 (tambahan; review tidak dihapus) |
+
+> Master data CRUD: `GET/POST /admin/{subjects|education-levels|categories}`, `PATCH/DELETE /admin/{...}/:id` (hapus ditolak 409 bila masih dipakai). `PATCH /admin/users/:id/suspend` body `{ status: "suspended" | "active", reason? }`.
 
 ## 13. Update Status via Polling (bukan WebSocket)
 
