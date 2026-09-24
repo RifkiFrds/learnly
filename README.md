@@ -107,7 +107,9 @@ Catatan teknis web:
 |---|---|---|
 | `NODE_ENV` | api | `development` / `production` / `test` (default `development`) |
 | `PORT` | api | Default `4000`; Railway meng-inject otomatis |
-| `CORS_ORIGIN` | api | Origin FE yang diizinkan, pisahkan koma (default `http://localhost:3000`) |
+| `CORS_ORIGIN` | api | Origin FE yang diizinkan, pisahkan koma (default `http://localhost:3000`). Browser memanggil API lewat proxy same-origin, tapi tetap isi domain Vercel (akses langsung & mode tanpa proxy) |
+| `COOKIE_SAME_SITE` | api | SameSite cookie refresh token: `lax` (default, FE lewat proxy) atau `none` (FE memanggil API langsung lintas domain — rawan diblokir Safari) |
+| `TRUST_PROXY_HOPS` | api | Jumlah proxy di depan API untuk IP asli (rate limit): `1` lokal/Railway saja, `2` di production (Vercel → Railway) |
 | `DATABASE_URL` | api | Connection string `mysql://...` |
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | api | Minimal 32 karakter |
 | `API_PUBLIC_URL`, `WEB_APP_URL` | api | URL publik API (untuk URL file lokal) & URL web app (untuk link di email) |
@@ -116,7 +118,8 @@ Catatan teknis web:
 | `MAIL_DRIVER` | api | `log` (dev, email dicetak ke console) atau `smtp` (Gmail) |
 | `GMAIL_USER`, `GMAIL_APP_PASSWORD` | api | Wajib jika `MAIL_DRIVER=smtp` |
 | `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD` | api | Akun admin pertama (password wajib di production) |
-| `NEXT_PUBLIC_API_BASE_URL` | web | Base URL API **termasuk** `/api/v1` |
+| `NEXT_PUBLIC_API_BASE_URL` | web | Base URL API yang dipanggil browser. Default & disarankan: `/api/v1` (relatif, lewat proxy same-origin) |
+| `API_PROXY_TARGET` | web | **Server-side** (bukan `NEXT_PUBLIC`): origin API tujuan rewrite `/api/v1/*` & `/uploads/*`, mis. `http://localhost:4000` (dev) atau `https://<domain-railway>` (Vercel). Wajib saat build & runtime bila base URL relatif |
 | `NEXT_PUBLIC_MAP_TILE_URL` | web | Tile OpenStreetMap untuk Leaflet |
 
 `.env` / `.env.local` tidak pernah di-commit (lihat `.gitignore`); hanya `.env.example` yang masuk repo.
@@ -131,12 +134,16 @@ Import `api/postman/learnly.postman_collection.json` + `api/postman/learnly-loca
 2. **Railway** — New Project → Deploy from GitHub repo → set **Root Directory = `api`**. Tambahkan **MySQL** (New → Database → MySQL) di project yang sama. Di service `api`, set variables:
    - `DATABASE_URL` = `${{MySQL.MYSQL_URL}}` (reference variable dari plugin MySQL)
    - `NODE_ENV=production`, `CORS_ORIGIN=<URL Vercel>`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` (acak, ≥ 32 karakter)
+   - `COOKIE_SAME_SITE=lax` (default) dan `TRUST_PROXY_HOPS=2` — browser memanggil API lewat proxy Vercel (lihat langkah 3), jadi cookie refresh first-party di domain Vercel dan tidak diblokir Safari
    - `SEED_ADMIN_PASSWORD` (≥ 12 karakter) — dipakai membuat akun admin pertama
    - `STORAGE_DRIVER=cloudinary` + `CLOUDINARY_*` (filesystem Railway tidak permanen); `MAIL_DRIVER=smtp` + `GMAIL_*` untuk email reset password (atau `MAIL_DRIVER=log` sementara)
    - `API_PUBLIC_URL=https://<domain-railway>` dan `WEB_APP_URL=<URL Vercel>`
    - Build/start/healthcheck sudah diatur di `api/railway.json` (`npm run build` → `npm run start`, yang otomatis menjalankan `prisma migrate deploy` + seed). Lalu Settings → Networking → **Generate Domain**.
-3. **Vercel** — Add New Project → import repo → set **Root Directory = `web`** (framework Next.js terdeteksi otomatis, tanpa config tambahan). Set env `NEXT_PUBLIC_API_BASE_URL=https://<domain-railway>/api/v1` dan `NEXT_PUBLIC_MAP_TILE_URL`.
-4. Kembali ke Railway, pastikan `CORS_ORIGIN` berisi domain Vercel final (mis. `https://learnly.vercel.app`), lalu buka landing page Vercel: badge harus hijau.
+3. **Vercel** — Add New Project → import repo → set **Root Directory = `web`** (framework Next.js terdeteksi otomatis). Set env (Production & Preview, sebelum build pertama):
+   - `API_PROXY_TARGET=https://<domain-railway>` (tanpa `/api/v1`) — `web/next.config.ts` me-rewrite `/api/v1/*` dan `/uploads/*` ke sini; build gagal dengan pesan jelas bila kosong
+   - `NEXT_PUBLIC_API_BASE_URL=/api/v1` (relatif; boleh dikosongkan karena ini default) dan `NEXT_PUBLIC_MAP_TILE_URL`
+   - Batas ukuran unggahan mengikuti API (bukti bayar ≤ 5 MB, tugas ≤ 10 MB); rewrite Vercel ke origin eksternal meneruskan body apa adanya
+4. Kembali ke Railway, pastikan `CORS_ORIGIN` dan `WEB_APP_URL` berisi domain Vercel final (mis. `https://learnly.vercel.app`), lalu buka landing page Vercel dan coba masuk — request di DevTools harus ke `https://<domain-vercel>/api/v1/...`, bukan langsung ke Railway.
 
 ## Dokumentasi — mulai dari sini
 

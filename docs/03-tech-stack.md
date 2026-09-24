@@ -91,6 +91,8 @@ learnly/
 | `NODE_ENV` | api | `development`/`production`/`test` (default `development`) |
 | `PORT` | api | port HTTP (default `4000`; di Railway di-inject otomatis) |
 | `CORS_ORIGIN` | api | origin FE yang diizinkan CORS, dipisah koma (URL Vercel di production) |
+| `COOKIE_SAME_SITE` | api | SameSite cookie refresh token: `lax` (default, via proxy) / `none` (lintas domain langsung) |
+| `TRUST_PROXY_HOPS` | api | jumlah proxy di depan API (`2` = Vercel → Railway) agar rate limit melihat IP asli |
 | `DATABASE_URL` | api | koneksi MySQL Railway |
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | api | signing token |
 | `API_PUBLIC_URL` | api | URL publik API (membentuk URL file saat `STORAGE_DRIVER=local`) |
@@ -100,7 +102,8 @@ learnly/
 | `MAIL_DRIVER` | api | `log` (dev, email dicetak ke console) atau `smtp` (Gmail) |
 | `GMAIL_USER`, `GMAIL_APP_PASSWORD` | api | kirim email reset password (wajib bila `MAIL_DRIVER=smtp`) |
 | `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD` | api | akun admin pertama yang dibuat seed (password wajib ≥ 12 karakter di production) |
-| `NEXT_PUBLIC_API_BASE_URL` | web | endpoint Express API (URL Railway) |
+| `NEXT_PUBLIC_API_BASE_URL` | web | base URL API untuk browser; default `/api/v1` (relatif, lewat proxy same-origin Next.js) |
+| `API_PROXY_TARGET` | web | origin Express API (URL Railway) tujuan rewrite `/api/v1/*` & `/uploads/*` — server-side, bukan `NEXT_PUBLIC` |
 | `NEXT_PUBLIC_MAP_TILE_URL` | web | tile OpenStreetMap |
 
 ## 4. Deployment Free-Tier

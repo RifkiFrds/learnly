@@ -5,7 +5,8 @@
 
 import type { AuthResult, PageMeta } from './types';
 
-export const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL ?? '').replace(/\/+$/, '');
+// Default relatif: lewat proxy same-origin (rewrite di next.config.ts). Bisa diisi URL absolut untuk mode langsung.
+export const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || '/api/v1').replace(/\/+$/, '');
 
 export interface ApiErrorDetail {
   field?: string;

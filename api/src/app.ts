@@ -47,7 +47,8 @@ export function createApp() {
   const app = express();
 
   app.set('json replacer', jsonReplacer);
-  app.set('trust proxy', 1); // di belakang proxy Railway (rate limit butuh IP asli)
+  // di belakang proxy (Railway, dan Vercel bila FE memakai rewrite) — rate limit butuh IP asli
+  app.set('trust proxy', env.TRUST_PROXY_HOPS);
 
   app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
   app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));

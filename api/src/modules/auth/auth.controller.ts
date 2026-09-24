@@ -14,11 +14,12 @@ import { authService } from './auth.service';
 
 export const REFRESH_COOKIE = 'learnly_refresh_token';
 
-// Production: FE (Vercel) & API (Railway) beda domain → cookie harus SameSite=None + Secure.
+// FE memanggil API lewat proxy same-origin (rewrite /api/v1/* di Next.js) → cookie first-party, SameSite=Lax,
+// tanpa atribut Domain (terikat ke host FE). SameSite=None (wajib Secure) hanya untuk mode lintas domain langsung.
 const cookieOptions: CookieOptions = {
   httpOnly: true,
-  secure: env.NODE_ENV === 'production',
-  sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
+  secure: env.NODE_ENV === 'production' || env.COOKIE_SAME_SITE === 'none',
+  sameSite: env.COOKIE_SAME_SITE,
   path: '/api/v1/auth',
 };
 

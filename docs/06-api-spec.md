@@ -5,7 +5,7 @@ Terkait: [02-srs.md](02-srs.md), [05-erd.md](05-erd.md), [07-ssd.md](07-ssd.md)
 
 ## 1. Konvensi Umum
 
-- **Base URL**: `https://api.learnly.id/api/v1` (contoh; dikonfigurasi via `NEXT_PUBLIC_API_BASE_URL`).
+- **Base URL**: `https://api.learnly.id/api/v1` (contoh). Browser memanggilnya lewat proxy same-origin di web (`/api/v1/*` → `API_PROXY_TARGET`), sehingga cookie refresh token (`SameSite=Lax`, `HttpOnly`, `Path=/api/v1/auth`) first-party di domain web.
 - **Format**: JSON, `Content-Type: application/json` (kecuali endpoint upload → `multipart/form-data`).
 - **Auth**: header `Authorization: Bearer <access_token>` untuk endpoint terproteksi.
 - **Versioning**: prefix `/v1`; breaking change berikutnya memakai `/v2`.

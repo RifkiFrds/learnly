@@ -16,6 +16,12 @@ const envSchema = z
           .map((origin) => origin.trim())
           .filter(Boolean),
       ),
+    // SameSite cookie refresh token. lax = FE memanggil API lewat proxy same-origin (rewrite Next.js);
+    // none (+Secure) hanya bila FE memanggil API langsung lintas domain (rawan diblokir Safari).
+    COOKIE_SAME_SITE: z.enum(['lax', 'strict', 'none']).default('lax'),
+    // Jumlah proxy di depan API: 1 = langsung di belakang Railway; 2 = browser → Vercel (rewrite) → Railway.
+    // Dipakai express 'trust proxy' agar rate limit melihat IP asli pengguna.
+    TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(5).default(1),
     // URL publik API ini (dipakai untuk membentuk URL file saat STORAGE_DRIVER=local)
     API_PUBLIC_URL: z.url().optional(),
     // URL web app (dipakai untuk link reset password / verifikasi email)

@@ -138,13 +138,13 @@ Detail lengkap ada di [07-ssd.md](07-ssd.md).
 ```mermaid
 flowchart TB
     U[User Browser] --> Vercel[Vercel: Next.js Web App]
-    Vercel -->|HTTPS REST + polling| Railway[Railway: Express API]
+    Vercel -->|rewrite /api/v1/* & /uploads/* — HTTPS REST + polling| Railway[Railway: Express API]
     Railway --> MySQL[(Railway: MySQL)]
     Railway --> Cloudinary[(Cloudinary)]
     Railway --> Gmail[Gmail SMTP]
 ```
 
-- **Frontend**: Vercel, auto-deploy dari `main` (root directory `web/`).
+- **Frontend**: Vercel, auto-deploy dari `main` (root directory `web/`). Browser hanya bicara dengan domain Vercel: `web/next.config.ts` me-rewrite `/api/v1/*` (dan `/uploads/*`) ke API (`API_PROXY_TARGET`). Dengan begitu cookie refresh token first-party (`SameSite=Lax`) dan tidak diblokir pencegahan pelacakan lintas situs (Safari ITP); CORS tidak dipakai oleh browser.
 - **Backend**: Railway, auto-deploy dari `main` (root directory `api/`), satu instance saja (tidak perlu horizontal scaling untuk skala tugas).
 - **Database**: MySQL plugin bawaan Railway, dalam project yang sama agar koneksi internal (private network) gratis & cepat.
 - **CI**: cukup lint + build check di GitHub Actions (opsional) sebelum push — deploy sepenuhnya diserahkan ke auto-deploy Vercel/Railway, tanpa pipeline custom.
