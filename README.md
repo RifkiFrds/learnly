@@ -79,9 +79,25 @@ npm install
 npm run dev                 # http://localhost:3000
 ```
 
-Badge di kanan atas landing page menunjukkan status koneksi ke API: hijau **"API: Terhubung"** jika `GET /health` sukses, merah **"API: Tidak terhubung"** jika API atau database tidak bisa dihubungi.
+Scripts: `dev`, `build`, `start`, `lint`, `typecheck`, `format`. Jalankan API lebih dulu — seluruh data (termasuk landing page) diambil dari API.
 
-Scripts: `dev`, `build`, `start`, `lint`, `typecheck`, `format`.
+**Akun demo** (dibuat oleh seed API): admin `admin@learnly.id` / `AdminLearnly#2026`, tutor `demo.tutor.budi@learnly.id` · `demo.tutor.dewi@learnly.id` · `demo.tutor.fajar@learnly.id` / `DemoLearnly123`. Siswa/orang tua: daftar sendiri di `/daftar`. Di mode development, halaman masuk menampilkan daftar akun demo, dan lupa password / verifikasi email menampilkan tautan langsung (tanpa email).
+
+**Halaman per peran** (route group App Router, guard per layout — belum login → `/masuk?next=…`, peran salah → halaman 403):
+
+| Peran | Halaman |
+|---|---|
+| Publik | `/` landing (pencarian hero, mapel, tutor & kursus unggulan), `/tutor` (filter + peta Leaflet + urut jarak), `/tutor/[id]`, `/kursus`, `/kursus/[slug]` |
+| Siswa & orang tua | `/beranda`, `/booking`, `/booking/baru` (stepper jadwal → lokasi → ringkasan biaya → bayar), `/booking/[id]` (stepper status, peta tutor, QR check-in 10 menit), `/pembayaran/[id]` (QRIS/transfer + unggah bukti), `/anak`, `/alamat`, `/laporan`, `/transaksi`, `/kursus-saya`, `/belajar/[id]` (player video/bacaan/kuis/tugas + sertifikat) |
+| Tutor | `/mengajar` (booking masuk paling atas), `/mengajar/booking/[id]` (status perjalanan, bagikan lokasi, pindai QR/kode manual, check-out + laporan), `/mengajar/profil`, `/mengajar/jadwal`, `/mengajar/pendapatan`, `/mengajar/ulasan` |
+| Admin | `/admin` (KPI), `/admin/tutor`, `/admin/pembayaran`, `/admin/dispute`, `/admin/kursus` (+ editor kurikulum & nilai), `/admin/pengguna`, `/admin/ulasan`, `/admin/master-data`, `/admin/pengaturan` |
+| Semua peran | `/akun`, `/notifikasi` |
+
+Catatan teknis web:
+- **Satu api-client** (`web/lib/api-client.ts`): semua request `credentials: 'include'`; access token di memori, refresh token di cookie httpOnly; 401 → refresh **sekali** lalu request diulang (request paralel berbagi satu refresh).
+- **TanStack Query** untuk semua fetch (`web/hooks/api/*`). Polling: detail booking & pembayaran tiap 5 detik sampai status final, notifikasi tiap 20 detik — tanpa WebSocket.
+- Token desain di blok `@theme` `web/app/globals.css` (Tailwind 4, tanpa `tailwind.config.ts`); status selalu lewat `StatusBadge` (`web/lib/status.ts`).
+- Kamera untuk scan QR butuh **HTTPS** (atau `localhost`); bila kamera ditolak/tidak ada, tutor memakai kode manual yang ditampilkan di bawah QR siswa.
 
 > Windows: jika `npm run build` di `api/` gagal dengan `EPERM ... query_engine-windows.dll.node`, hentikan dulu `npm run dev` (file engine Prisma sedang dikunci proses yang berjalan).
 

@@ -19,7 +19,8 @@ const buttonVariants = cva(
       },
       size: {
         default: 'h-11 px-5',
-        sm: 'h-9 px-3',
+        // 44px di layar sentuh (docs/10 §7), ringkas 36px mulai md
+        sm: 'h-11 px-3 md:h-9',
         lg: 'h-12 px-6 text-body-md',
         icon: 'size-11',
       },

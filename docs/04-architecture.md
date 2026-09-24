@@ -55,14 +55,15 @@ Proses seperti generate sertifikat PDF atau kirim email dipanggil **langsung** d
 learnly/
 ├── web/                             # Next.js (Vercel)
 │   ├── app/
-│   │   ├── (public)/                # landing, katalog tutor & kursus, detail
-│   │   ├── (auth)/                  # login, register, reset password
-│   │   ├── (student)/               # dashboard siswa/parent
-│   │   ├── (tutor)/                 # dashboard tutor
-│   │   └── (admin)/                 # dashboard admin (termasuk verifikasi pembayaran)
-│   ├── components/
-│   ├── lib/                         # api-client, map-provider
-│   └── hooks/
+│   │   ├── (public)/                # landing, cari tutor, detail tutor, katalog & detail kursus, 403
+│   │   ├── (auth)/                  # masuk, daftar, lupa/reset password, verifikasi email
+│   │   ├── (student)/               # siswa & orang tua: beranda, booking (+alur baru), pembayaran, anak, alamat, laporan, transaksi, kursus saya, player /belajar
+│   │   ├── (tutor)/mengajar/        # dasbor, booking + kontrol status/QR/check-out, profil & dokumen, jadwal & wilayah, pendapatan, ulasan
+│   │   ├── (admin)/admin/           # ringkasan KPI, verifikasi tutor & pembayaran, dispute/refund, kursus (editor), pengguna, ulasan, master data, pengaturan
+│   │   └── (account)/               # semua peran: /akun, /notifikasi (tambahan Track B — dipakai bersama tanpa menggandakan halaman per peran)
+│   ├── components/                  # ui/ (shadcn restyled), common/ (StatusBadge, state, dialog), layout/, booking/, course/, admin/, map/, …
+│   ├── lib/                         # api-client (refresh token otomatis), auth, format (IDR/WIB), status, geo, types
+│   └── hooks/api/                   # hook TanStack Query per domain (satu-satunya jalur fetch)
 │
 ├── api/                             # Express (Railway)
 │   ├── src/
