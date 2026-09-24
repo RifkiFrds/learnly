@@ -25,9 +25,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Learnly — Learn Your Way, Grow Your Future',
+  title: { default: "Learnly — Learn Your Way, Grow Your Future", template: "%s · Learnly" },
   description:
-    'Kursus online, tutor online, dan tutor yang datang ke rumahmu — dalam satu platform belajar.',
+    "Kursus online, tutor online, dan tutor yang datang ke rumahmu — dalam satu platform belajar.",
 };
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {

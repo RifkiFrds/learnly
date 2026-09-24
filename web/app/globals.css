@@ -1,67 +1,115 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
-
-/* Design tokens Learnly (warna, font, skala tipografi) — lihat docs/10-design-system.md §4 */
-@config '../tailwind.config.ts';
+@import 'leaflet/dist/leaflet.css';
 
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Alias semantik yang dipakai primitives shadcn/ui (bg-primary, text-muted-foreground, ring, dst.).
- * Nilainya WAJIB cermin dari token di tailwind.config.ts — bukan palet baru.
- * Dark mode belum dalam scope (docs/10-design-system.md §9), jadi hanya light mode.
+ * Design tokens Learnly — sumber: docs/10-design-system.md §4.
+ * Palet bawaan Tailwind dimatikan (--color-*: initial) supaya komponen HANYA bisa memakai token resmi.
+ * Nilai di sini wajib sama persis dengan tabel §4.1.
  */
-@theme inline {
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --radius-sm: calc(var(--radius) * 0.5);
-  --radius-md: calc(var(--radius) * 0.75);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.5);
+@theme {
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  /* §4.1 warna */
+  --color-background: #faf8f4;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f1ede5;
+  --color-ink-900: #231f1a;
+  --color-ink-700: #4a443c;
+  --color-ink-500: #7a7267;
+  --color-ink-300: #b6ada0;
+  --color-border: #e4dfd5;
+  --color-primary-100: #f3e1d6;
+  --color-primary-600: #c15f3c;
+  --color-primary-700: #a24d2f;
+  --color-success-100: #e1ebe3;
+  --color-success-600: #4a7c59;
+  --color-warning-100: #f3e7cf;
+  --color-warning-600: #b4842a;
+  --color-danger-100: #f3dcd4;
+  --color-danger-600: #b3432b;
+  --color-info-100: #dee9ef;
+  --color-info-600: #3d6b8a;
+
+  /* §4.2 skala tipografi */
+  --text-display-lg: 3rem;
+  --text-display-lg--line-height: 1.1;
+  --text-display-lg--font-weight: 600;
+  --text-display-md: 2.25rem;
+  --text-display-md--line-height: 1.15;
+  --text-display-md--font-weight: 600;
+  --text-heading-lg: 1.5rem;
+  --text-heading-lg--line-height: 1.3;
+  --text-heading-lg--font-weight: 600;
+  --text-heading-md: 1.25rem;
+  --text-heading-md--line-height: 1.35;
+  --text-heading-md--font-weight: 600;
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.6;
+  --text-body-md: 1rem;
+  --text-body-md--line-height: 1.6;
+  --text-body-sm: 0.875rem;
+  --text-body-sm--line-height: 1.5;
+  --text-label-sm: 0.75rem;
+  --text-label-sm--line-height: 1.4;
+  --text-label-sm--font-weight: 600;
+  --text-label-sm--letter-spacing: 0.05em;
+
+  /* §4.3 shadow halus, tanpa warna */
+  --shadow-sm: 0 1px 2px rgba(35, 31, 26, 0.06);
+  --shadow-md: 0 4px 12px rgba(35, 31, 26, 0.08);
+
+  /* §4.4 lebar konten maksimum */
+  --container-content: 1280px;
 }
 
-:root {
-  --radius: 0.5rem; /* rounded-lg = 8px untuk card & input (§4.3) */
-  --background: #faf8f4; /* background */
-  --foreground: #231f1a; /* ink-900 */
-  --card: #ffffff; /* surface */
-  --card-foreground: #231f1a;
-  --popover: #ffffff;
-  --popover-foreground: #231f1a;
-  --primary: #c15f3c; /* primary-600 */
-  --primary-foreground: #ffffff;
-  --secondary: #f1ede5; /* surface-muted */
-  --secondary-foreground: #231f1a;
-  --muted: #f1ede5;
-  --muted-foreground: #7a7267; /* ink-500 */
-  --accent: #f1ede5;
-  --accent-foreground: #231f1a;
-  --destructive: #b3432b; /* danger-600 */
-  --input: #e4dfd5; /* border */
-  --ring: #c15f3c; /* focus ring primary-600 (§5, §7) */
+/* Font dari next/font (CSS variable di <html>) + alias semantik untuk primitives shadcn/ui.
+ * Alias WAJIB cermin token di atas — bukan palet baru. */
+@theme inline {
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-plus-jakarta-sans), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+
+  --color-foreground: var(--color-ink-900);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-ink-900);
+  --color-popover: var(--color-surface);
+  --color-popover-foreground: var(--color-ink-900);
+  --color-primary: var(--color-primary-600);
+  --color-primary-foreground: var(--color-white);
+  --color-secondary: var(--color-surface-muted);
+  --color-secondary-foreground: var(--color-ink-900);
+  --color-muted: var(--color-surface-muted);
+  --color-muted-foreground: var(--color-ink-500);
+  --color-accent: var(--color-surface-muted);
+  --color-accent-foreground: var(--color-ink-900);
+  --color-destructive: var(--color-danger-600);
+  --color-input: var(--color-border);
+  --color-ring: var(--color-primary-600);
+
+  /* rounded-lg = 8px untuk card & input (§4.3) */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+  /* fieldset bawaan browser min-width: min-content → baris chip yang bisa di-scroll malah melebarkan halaman */
+  fieldset {
+    min-width: 0;
+  }
   html {
     @apply bg-background;
+    -webkit-tap-highlight-color: transparent;
   }
   body {
     @apply bg-background font-sans text-body-md text-ink-700 antialiased;
@@ -78,5 +126,59 @@
   }
   ::selection {
     @apply bg-primary-100 text-ink-900;
+  }
+  /* §7: focus terlihat untuk semua elemen interaktif, bukan outline: none */
+  :focus-visible {
+    outline: 2px solid var(--color-primary-600);
+    outline-offset: 2px;
+  }
+  /* Peta Leaflet memakai font aplikasi */
+  .leaflet-container {
+    font-family: inherit;
+    background: var(--color-surface-muted);
+  }
+}
+
+/* Ringkasan markdown sederhana untuk materi kursus */
+@layer components {
+  .prose-learnly h2 {
+    @apply mt-6 mb-2 font-display text-heading-lg text-ink-900;
+  }
+  .prose-learnly h3 {
+    @apply mt-4 mb-2 font-sans text-heading-md text-ink-900;
+  }
+  .prose-learnly p {
+    @apply mb-3 text-body-lg text-ink-700;
+  }
+  .prose-learnly ul,
+  .prose-learnly ol {
+    @apply mb-3 ml-5 text-body-lg text-ink-700;
+  }
+  .prose-learnly ul {
+    list-style: disc;
+  }
+  .prose-learnly ol {
+    list-style: decimal;
+  }
+  .prose-learnly strong {
+    @apply font-semibold text-ink-900;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Denyut halus penanda lokasi/status aktif (§5 stepper: "pulse halus, bukan animasi mencolok") */
+@keyframes ping {
+  75%,
+  100% {
+    transform: scale(2);
+    opacity: 0;
   }
 }
