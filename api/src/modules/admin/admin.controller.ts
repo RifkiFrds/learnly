@@ -6,7 +6,12 @@ import { currentUser } from '../../middlewares/auth.middleware';
 import type { idParam } from '../../middlewares/validate';
 import { settingsService } from '../settings/settings.service';
 import type { PlatformSettings } from '../settings/settings.schema';
-import type { DashboardQuery, SuspendUserBody } from './admin.schema';
+import type {
+  AdminReviewsQuery,
+  AdminUsersQuery,
+  DashboardQuery,
+  SuspendUserBody,
+} from './admin.schema';
 import { adminService } from './admin.service';
 
 type IdParam = z.infer<typeof idParam>;
@@ -16,6 +21,16 @@ export const adminController = {
     const { id } = req.valid.params as IdParam;
     const body = req.valid.body as SuspendUserBody;
     sendSuccess(res, await adminService.setUserStatus(currentUser(req).userId, id, body));
+  }) satisfies RequestHandler,
+
+  listUsers: (async (req, res) => {
+    const { items, meta } = await adminService.listUsers(req.valid.query as AdminUsersQuery);
+    sendSuccess(res, items, 200, meta);
+  }) satisfies RequestHandler,
+
+  listReviews: (async (req, res) => {
+    const { items, meta } = await adminService.listReviews(req.valid.query as AdminReviewsQuery);
+    sendSuccess(res, items, 200, meta);
   }) satisfies RequestHandler,
 
   dashboardSummary: (async (req, res) => {

@@ -26,6 +26,60 @@ export const adminRepository = {
     });
   },
 
+  listUsers(where: Prisma.UserWhereInput, skip: number, take: number) {
+    return prisma.$transaction([
+      prisma.user.findMany({
+        where,
+        select: {
+          ...publicUserSelect,
+          tutorProfile: { select: { id: true, verificationStatus: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take,
+      }),
+      prisma.user.count({ where }),
+    ]);
+  },
+
+  listReviews(where: Prisma.ReviewWhereInput, skip: number, take: number) {
+    return prisma.$transaction([
+      prisma.review.findMany({
+        where,
+        include: { reviewer: { select: { id: true, fullName: true, email: true } } },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+        skip,
+        take,
+      }),
+      prisma.review.count({ where }),
+    ]);
+  },
+
+  /** Judul target review (nama tutor untuk booking, judul kursus) agar moderasi punya konteks */
+  async reviewTargets(bookingIds: bigint[], courseIds: bigint[]) {
+    const [bookings, courses] = await Promise.all([
+      bookingIds.length
+        ? prisma.booking.findMany({
+            where: { id: { in: bookingIds } },
+            select: {
+              id: true,
+              tutorProfile: { select: { id: true, user: { select: { fullName: true } } } },
+            },
+          })
+        : [],
+      courseIds.length
+        ? prisma.course.findMany({
+            where: { id: { in: courseIds } },
+            select: { id: true, title: true, slug: true },
+          })
+        : [],
+    ]);
+    return {
+      bookings: new Map(bookings.map((row) => [row.id, row])),
+      courses: new Map(courses.map((row) => [row.id, row])),
+    };
+  },
+
   // ---- Dashboard (FR-ADMIN-05) — query langsung ke DB (NFR-OBS-02)
   async dashboard(from: Date, to: Date) {
     const inPeriod = { gte: from, lt: to };

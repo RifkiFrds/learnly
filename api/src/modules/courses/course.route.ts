@@ -9,10 +9,12 @@ import { reviewController } from '../reviews/review.controller';
 import { courseController, enrollmentController } from './course.controller';
 import {
   courseBody,
+  courseLessonParam,
   enrollBody,
   gradeAssignmentBody,
   lessonActionBody,
   lessonBody,
+  lessonUpdateBody,
   moduleLessonParam,
   modulesBody,
   quizAttemptBody,
@@ -49,6 +51,18 @@ courseRouter.post(
   ...adminOnly,
   validate({ params: moduleLessonParam, body: lessonBody }),
   courseController.addLesson,
+);
+courseRouter.put(
+  '/:id/lessons/:lessonId',
+  ...adminOnly,
+  validate({ params: courseLessonParam, body: lessonUpdateBody }),
+  courseController.updateLesson,
+);
+courseRouter.delete(
+  '/:id/lessons/:lessonId',
+  ...adminOnly,
+  validate({ params: courseLessonParam }),
+  courseController.deleteLesson,
 );
 courseRouter.patch(
   '/:id/submit-review',

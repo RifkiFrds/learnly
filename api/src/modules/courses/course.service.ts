@@ -218,6 +218,47 @@ export const courseService = {
     return formatCourse(await getCourse(courseId), 'admin');
   },
 
+  /** Ubah lesson. Soal kuis hanya bisa diganti selama belum ada peserta yang mengerjakan. */
+  async updateLesson(adminId: bigint, courseId: bigint, lessonId: bigint, input: LessonBody) {
+    const course = await getCourse(courseId);
+    assertCreator(course, adminId);
+    const lesson = course.modules.flatMap((mod) => mod.lessons).find((row) => row.id === lessonId);
+    if (!lesson) throw Errors.notFound('Lesson tidak ditemukan di kursus ini');
+    if (lesson.type !== input.type) {
+      throw Errors.businessRule('Tipe lesson tidak bisa diubah. Hapus lalu buat lesson baru.');
+    }
+    const replaceQuestions = input.type === 'quiz' && input.questions;
+    if (replaceQuestions && (await courseRepository.countQuizAttempts(lessonId)) > 0) {
+      throw Errors.businessRule('Soal kuis yang sudah dikerjakan peserta tidak bisa diganti');
+    }
+    await courseRepository.updateLesson(
+      lessonId,
+      {
+        title: input.title,
+        contentUrl: input.contentUrl ?? null,
+        contentBody: input.contentBody ?? null,
+        durationSeconds: input.durationSeconds ?? null,
+        ...(input.orderIndex !== undefined ? { orderIndex: input.orderIndex } : {}),
+      },
+      replaceQuestions ? input.questions : undefined,
+    );
+    return formatCourse(await getCourse(courseId), 'admin');
+  },
+
+  /** Hapus lesson yang belum pernah dipelajari/dikerjakan peserta. */
+  async deleteLesson(adminId: bigint, courseId: bigint, lessonId: bigint) {
+    const course = await getCourse(courseId);
+    assertCreator(course, adminId);
+    if (!course.modules.some((mod) => mod.lessons.some((row) => row.id === lessonId))) {
+      throw Errors.notFound('Lesson tidak ditemukan di kursus ini');
+    }
+    if ((await courseRepository.countLessonActivity(lessonId)) > 0) {
+      throw Errors.businessRule('Lesson yang sudah dipelajari peserta tidak bisa dihapus');
+    }
+    await courseRepository.deleteLesson(lessonId);
+    return formatCourse(await getCourse(courseId), 'admin');
+  },
+
   // FR-COURSE-03: draft → in_review → published
   async submitReview(adminId: bigint, courseId: bigint) {
     const course = await getCourse(courseId);

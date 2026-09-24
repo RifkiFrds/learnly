@@ -203,14 +203,15 @@ export function formatBooking(
 }
 
 async function detail(bookingId: bigint, as: ViewerRole) {
-  const [booking, history, latestLocation, payment, settings] = await Promise.all([
+  const [booking, history, latestLocation, payment, settings, review] = await Promise.all([
     bookingRepository.findById(prisma, bookingId),
     bookingRepository.findHistory(bookingId),
     bookingRepository.findLatestLocation(bookingId),
     paymentRepository.findLatestForPayable(prisma, 'booking', bookingId),
     settingsService.get(),
+    prisma.review.findFirst({ where: { reviewableType: 'tutor_booking', reviewableId: bookingId } }),
   ]);
-  return formatBooking(booking!, as, {
+  const formatted = formatBooking(booking!, as, {
     payment,
     settings,
     latestLocation,
@@ -221,6 +222,29 @@ async function detail(bookingId: bigint, as: ViewerRole) {
       changedByUserId: row.changedByUserId,
     })),
   });
+  // Ulasan sesi ini (FR-REVIEW-01/02/03): FE perlu tahu apakah menulis baru, mengedit, atau membalas
+  const editableUntil = review
+    ? new Date(review.createdAt.getTime() + settings.reviewEditDays * 86_400_000)
+    : null;
+  const canEdit = Boolean(editableUntil && editableUntil.getTime() > Date.now());
+  return {
+    ...formatted,
+    availableActions: formatted.availableActions.flatMap((action) =>
+      action !== 'write_review' || !review ? [action] : canEdit ? ['edit_review'] : [],
+    ),
+    review: review
+      ? {
+          id: review.id,
+          rating: review.rating,
+          comment: review.comment,
+          replyText: review.replyText,
+          repliedAt: review.repliedAt,
+          isHidden: review.isHidden,
+          createdAt: review.createdAt,
+          editableUntil,
+        }
+      : null,
+  };
 }
 
 export const bookingService = {

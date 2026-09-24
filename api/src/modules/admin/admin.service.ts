@@ -8,7 +8,13 @@ import { notificationService } from '../notifications/notification.service';
 import { PAYMENT_STATUS_LABEL } from '../payments/payment.policy';
 import { paymentRepository } from '../payments/payment.repository';
 import { adminRepository } from './admin.repository';
-import type { DashboardQuery, SuspendUserBody } from './admin.schema';
+import { buildMeta, toSkipTake } from '../../lib/pagination';
+import type {
+  AdminReviewsQuery,
+  AdminUsersQuery,
+  DashboardQuery,
+  SuspendUserBody,
+} from './admin.schema';
 
 const DEFAULT_PERIOD_DAYS = 30;
 
@@ -40,6 +46,60 @@ export const adminService = {
           },
     );
     return updated;
+  },
+
+  // FR-ADMIN-02: daftar akun untuk dicari & ditangguhkan
+  async listUsers(query: AdminUsersQuery) {
+    const { skip, take } = toSkipTake(query);
+    const [items, total] = await adminRepository.listUsers(
+      {
+        ...(query.role ? { role: query.role } : {}),
+        ...(query.status ? { status: query.status } : {}),
+        ...(query.q
+          ? { OR: [{ fullName: { contains: query.q } }, { email: { contains: query.q } }] }
+          : {}),
+      },
+      skip,
+      take,
+    );
+    return { items, meta: buildMeta(query.page, query.limit, total) };
+  },
+
+  // FR-REVIEW-05: daftar ulasan (termasuk yang disembunyikan) untuk moderasi
+  async listReviews(query: AdminReviewsQuery) {
+    const { skip, take } = toSkipTake(query);
+    const [rows, total] = await adminRepository.listReviews(
+      {
+        ...(query.reviewableType ? { reviewableType: query.reviewableType } : {}),
+        ...(query.hidden !== undefined ? { isHidden: query.hidden } : {}),
+      },
+      skip,
+      take,
+    );
+    const targets = await adminRepository.reviewTargets(
+      rows.filter((row) => row.reviewableType === 'tutor_booking').map((row) => row.reviewableId),
+      rows.filter((row) => row.reviewableType === 'course').map((row) => row.reviewableId),
+    );
+    const items = rows.map((row) => {
+      const booking = targets.bookings.get(row.reviewableId);
+      const course = targets.courses.get(row.reviewableId);
+      return {
+        ...row,
+        target:
+          row.reviewableType === 'tutor_booking'
+            ? booking
+              ? {
+                  type: 'tutor',
+                  tutorProfileId: booking.tutorProfile.id,
+                  name: booking.tutorProfile.user.fullName,
+                }
+              : null
+            : course
+              ? { type: 'course', courseId: course.id, slug: course.slug, name: course.title }
+              : null,
+      };
+    });
+    return { items, meta: buildMeta(query.page, query.limit, total) };
   },
 
   // FR-ADMIN-05: ringkasan KPI (default 30 hari terakhir)

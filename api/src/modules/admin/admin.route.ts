@@ -19,7 +19,12 @@ import { updateSettingsBody } from '../settings/settings.schema';
 import { tutorController } from '../tutors/tutor.controller';
 import { adminTutorListQuery, verifyTutorBody } from '../tutors/tutor.schema';
 import { adminController } from './admin.controller';
-import { dashboardQuery, suspendUserBody } from './admin.schema';
+import {
+  adminReviewsQuery,
+  adminUsersQuery,
+  dashboardQuery,
+  suspendUserBody,
+} from './admin.schema';
 import { masterDataAdminRouter } from './master-data.route';
 
 // Semua endpoint /admin/* khusus role admin (FR-ADMIN-*)
@@ -35,6 +40,7 @@ adminRouter.patch(
 );
 
 // Suspend/reaktivasi akun (FR-ADMIN-02)
+adminRouter.get('/users', validate({ query: adminUsersQuery }), adminController.listUsers);
 adminRouter.patch(
   '/users/:id/suspend',
   validate({ params: idParam, body: suspendUserBody }),
@@ -89,6 +95,7 @@ adminRouter.get(
 adminRouter.get('/disputes', adminController.disputes);
 
 // Moderasi ulasan (FR-REVIEW-05) — ulasan disembunyikan, tidak dihapus
+adminRouter.get('/reviews', validate({ query: adminReviewsQuery }), adminController.listReviews);
 adminRouter.patch(
   '/reviews/:id/visibility',
   validate({ params: idParam, body: reviewVisibilityBody }),

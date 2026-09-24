@@ -218,6 +218,10 @@ async function detail(enrollmentId: bigint) {
     settingsService.get(),
   ]);
   const e = enrollment!;
+  // Ulasan kursus milik akun ini (FR-REVIEW-01/02) → FE tahu harus menulis baru atau mengedit
+  const review = await prisma.review.findFirst({
+    where: { reviewableType: 'course', reviewableId: e.course.id, reviewerUserId: e.learner.ownerUserId },
+  });
   const access = hasAccess(e.course, payment);
   const result = evaluate(e, settings.defaultPassingGrade);
   const progressByLesson = new Map(e.lessonProgress.map((row) => [row.lessonId, row]));
@@ -273,6 +277,18 @@ async function detail(enrollmentId: bigint) {
         }
       : null,
     certificateEligibility: result.eligibility,
+    review: review
+      ? {
+          id: review.id,
+          rating: review.rating,
+          comment: review.comment,
+          replyText: review.replyText,
+          repliedAt: review.repliedAt,
+          isHidden: review.isHidden,
+          createdAt: review.createdAt,
+          editableUntil: new Date(review.createdAt.getTime() + settings.reviewEditDays * 86_400_000),
+        }
+      : null,
   };
 }
 

@@ -191,8 +191,17 @@ export const paymentService = {
 
   async getById(viewer: Viewer, paymentId: bigint) {
     await sweepExpired();
-    await loadForViewer(paymentId, viewer);
-    return formatOne(paymentId, viewer.role === 'admin');
+    const payment = await loadForViewer(paymentId, viewer);
+    const [formatted, settings] = await Promise.all([
+      formatOne(paymentId, viewer.role === 'admin'),
+      settingsService.get(),
+    ]);
+    // Instruksi bayar ikut dikirim agar satu halaman pembayaran FE bisa dipakai untuk booking & kursus
+    const { paymentMethods, instructions, canUploadProof } = buildPaymentInstructions(
+      payment,
+      settings,
+    );
+    return { ...formatted, paymentMethods, instructions, canUploadProof };
   },
 
   // FR-PAY-03: upload bukti → menunggu_verifikasi (bisa diunggah ulang selama belum diverifikasi)

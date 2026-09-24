@@ -75,6 +75,46 @@ export const courseRepository = {
     });
   },
 
+  countQuizAttempts(lessonId: bigint) {
+    return prisma.quizAttempt.count({ where: { lessonId } });
+  },
+
+  async countLessonActivity(lessonId: bigint) {
+    const [progress, attempts, submissions] = await Promise.all([
+      prisma.lessonProgress.count({ where: { lessonId } }),
+      prisma.quizAttempt.count({ where: { lessonId } }),
+      prisma.assignmentSubmission.count({ where: { lessonId } }),
+    ]);
+    return progress + attempts + submissions;
+  },
+
+  updateLesson(
+    lessonId: bigint,
+    data: Prisma.CourseLessonUncheckedUpdateInput,
+    questions?: { questionText: string; options: { optionText: string; isCorrect: boolean }[] }[],
+  ) {
+    return prisma.$transaction(async (tx) => {
+      await tx.courseLesson.update({ where: { id: lessonId }, data });
+      if (questions) {
+        await tx.quizQuestion.deleteMany({ where: { lessonId } });
+        for (const [orderIndex, question] of questions.entries()) {
+          await tx.quizQuestion.create({
+            data: {
+              lessonId,
+              questionText: question.questionText,
+              orderIndex,
+              options: { create: question.options },
+            },
+          });
+        }
+      }
+    });
+  },
+
+  deleteLesson(lessonId: bigint) {
+    return prisma.courseLesson.delete({ where: { id: lessonId } });
+  },
+
   createLesson(data: Prisma.CourseLessonUncheckedCreateInput) {
     return prisma.courseLesson.create({
       data,
@@ -88,7 +128,8 @@ export const courseRepository = {
       prisma.course.findMany({
         where,
         include: courseInclude,
-        orderBy: { updatedAt: 'asc' },
+        // antrian review: yang terlama diajukan di atas (FIFO); status lain: terbaru di atas
+        orderBy: { updatedAt: status === 'in_review' ? 'asc' : 'desc' },
         skip,
         take,
       }),

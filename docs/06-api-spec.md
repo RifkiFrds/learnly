@@ -92,6 +92,7 @@ Catatan implementasi:
 | PATCH | `/addresses/:id` | owner | Edit alamat |
 | DELETE | `/addresses/:id` | owner | Hapus alamat |
 | GET | `/subjects`, `/education-levels`, `/categories` | public | Master data untuk dropdown filter (tambahan implementasi) |
+| GET | `/settings/public` | public | Aturan platform publik: `serviceFee`, `cancellationPolicy`, `bookingResponseHours`, `paymentWindowHours`, `meetingLinkVisibleHours`, `reviewEditDays` (tanpa rekening/QRIS) — tambahan Track B untuk ringkasan biaya & modal batal |
 
 ## 4. Tutor Profile & Availability (`/tutors`) — FR-TUTOR-*
 
@@ -123,7 +124,7 @@ Catatan implementasi:
 |---|---|---|---|
 | POST | `/bookings` | student, parent | Buat booking baru (`learnerId, tutorProfileId, subjectId, mode, scheduledStartAt, durationMinutes, addressId?`) |
 | GET | `/bookings` | student, parent, tutor | Daftar booking milik sendiri (filter `status`) |
-| GET | `/bookings/:id` | pemilik terkait | Detail booking + status history |
+| GET | `/bookings/:id` | pemilik terkait | Detail booking + status history. Juga `review` (ulasan sesi ini: `id, rating, comment, replyText, repliedAt, isHidden, createdAt, editableUntil` atau `null`); `availableActions` memuat `write_review` bila belum diulas atau `edit_review` selama masih dalam window edit — tambahan Track B |
 | PATCH | `/bookings/:id/respond` | tutor | Terima/tolak booking (`action: accept|reject`) |
 | GET | `/bookings/:id/payment-info` | student, parent | Nominal tagihan + gambar QRIS/info rekening (lihat §9) |
 | PATCH | `/bookings/:id/status` | tutor | Update status perjalanan (`tutor_bersiap`, `tutor_dalam_perjalanan`, `tutor_tiba`) |
@@ -159,12 +160,14 @@ Catatan implementasi:
 | PATCH | `/courses/:id/submit-review` | admin | `draft` → `in_review` |
 | PATCH | `/courses/:id/publish` | admin | `in_review` → `published` |
 | POST | `/courses/:id/enroll` | student, parent | Enroll (gratis langsung; berbayar → return payment info) |
-| GET | `/enrollments/:id` | pemilik | Progres & status enrollment |
+| GET | `/enrollments/:id` | pemilik | Progres & status enrollment. Juga `review`: ulasan kursus milik akun ini (`id, rating, comment, replyText, repliedAt, isHidden, createdAt, editableUntil`) atau `null` — tambahan Track B |
 | POST | `/lessons/:id/complete` | pemilik enrollment | Tandai lesson selesai (video/artikel) |
 | POST | `/lessons/:id/quiz-attempts` | pemilik enrollment | Submit jawaban kuis → skor otomatis |
 | POST | `/lessons/:id/assignments` | pemilik enrollment | Upload tugas |
 | PATCH | `/assignments/:id/grade` | admin/instruktur | Beri nilai & feedback tugas |
 | GET | `/enrollments/:id/certificate` | pemilik | Unduh sertifikat (jika sudah terbit) |
+| PUT | `/courses/:id/lessons/:lessonId` | admin (pembuat) | Ubah lesson (tipe tetap). Untuk kuis, `questions` opsional: kirim hanya bila soal ingin diganti (ditolak bila sudah dikerjakan peserta); tanpa `questions` soal lama dipertahankan — tambahan Track B |
+| DELETE | `/courses/:id/lessons/:lessonId` | admin (pembuat) | Hapus lesson yang belum dipelajari peserta — tambahan Track B |
 | PATCH | `/courses/:id/reject` | admin | `in_review` → `draft` dengan `notes` (FR-ADMIN-04, tambahan) |
 | GET | `/courses/:id/grades` | admin | Rekap nilai seluruh peserta (FR-EVAL-02, tambahan) |
 | GET | `/courses/:id/reviews` | public | Daftar review kursus |
@@ -183,6 +186,8 @@ Catatan implementasi:
 | PATCH | `/admin/payments/:id/verify` | admin | `{ action: "approve" \| "reject", rejectionReason? }` → `paid` (lanjutkan booking/enrollment) atau `ditolak` |
 | GET | `/tutors/me/earnings` | tutor | Ringkasan pendapatan per periode (dihitung dari `payments.status = paid`) |
 | PATCH | `/admin/payments/:id/refund` | admin | Catat refund manual (`note`, `refundAmount?`) → status `refunded` (FR-PAY-06, tambahan) |
+
+> `GET /payments/:id` juga mengembalikan `paymentMethods`, `instructions`, dan `canUploadProof` (sama dengan payment-info booking) agar satu halaman pembayaran FE melayani booking & kursus — tambahan Track B.
 
 > Catatan implementasi: approve/reject idempotent (mengulang aksi yang sama mengembalikan `alreadyProcessed: true`). Reject pembayaran booking otomatis membatalkan booking (FR-PAY-04). Status pembayaran bertambah `refunded`.
 
@@ -219,6 +224,8 @@ Catatan implementasi:
 | GET | `/admin/disputes` | admin | Daftar booking/pembayaran bermasalah |
 | PATCH | `/admin/settings` | admin | Update `platform_settings` (service fee %, cancel window, dsb.) |
 | GET | `/admin/settings` | admin | Lihat pengaturan (tambahan) |
+| GET | `/admin/users` | admin | Daftar akun (`role`, `status`, `q`, paginasi) untuk suspend/reaktivasi — tambahan Track B |
+| GET | `/admin/reviews` | admin | Daftar ulasan termasuk yang disembunyikan (`hidden`, `reviewableType`) + target — tambahan Track B |
 | POST | `/admin/settings/qris-image` | admin | Upload gambar QRIS statis (tambahan) |
 | PATCH | `/admin/bookings/:id/status` | admin | Override status booking untuk dispute (`status`, `reason`) — FR-ADMIN-06 (tambahan) |
 | PATCH | `/admin/reviews/:id/visibility` | admin | Sembunyikan/tampilkan review (`isHidden`) — FR-REVIEW-05 (tambahan; review tidak dihapus) |

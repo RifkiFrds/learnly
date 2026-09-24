@@ -40,24 +40,26 @@ const quizQuestion = z.object({
     }),
 });
 
-export const lessonBody = z
-  .object({
-    title: z.string().trim().min(2).max(191),
-    type: z.enum(['video', 'article', 'quiz', 'assignment']),
-    contentUrl: z.url().max(500).optional(),
-    contentBody: z.string().trim().max(200_000).optional(),
-    durationSeconds: z.number().int().min(0).max(86_400).optional(),
-    orderIndex: z.number().int().min(0).max(1000).optional(),
-    questions: z.array(quizQuestion).min(1).max(50).optional(),
-  })
-  .superRefine((body, ctx) => {
+const lessonFields = z.object({
+  title: z.string().trim().min(2).max(191),
+  type: z.enum(['video', 'article', 'quiz', 'assignment']),
+  contentUrl: z.url().max(500).optional(),
+  contentBody: z.string().trim().max(200_000).optional(),
+  durationSeconds: z.number().int().min(0).max(86_400).optional(),
+  orderIndex: z.number().int().min(0).max(1000).optional(),
+  questions: z.array(quizQuestion).min(1).max(50).optional(),
+});
+
+/** questionsRequired=false untuk update: kuis tanpa "questions" = soal lama dipertahankan */
+function lessonRules(questionsRequired: boolean) {
+  return (body: z.infer<typeof lessonFields>, ctx: z.RefinementCtx) => {
     const need = (field: 'contentUrl' | 'contentBody' | 'questions', message: string) => {
       if (!body[field]) ctx.addIssue({ code: 'custom', path: [field], message });
     };
     if (body.type === 'video') need('contentUrl', 'Lesson video wajib punya contentUrl');
     if (body.type === 'article') need('contentBody', 'Lesson artikel wajib punya contentBody');
     if (body.type === 'assignment') need('contentBody', 'Tulis instruksi tugas di contentBody');
-    if (body.type === 'quiz') need('questions', 'Lesson kuis wajib punya daftar soal');
+    if (body.type === 'quiz' && questionsRequired) need('questions', 'Lesson kuis wajib punya daftar soal');
     if (body.type !== 'quiz' && body.questions) {
       ctx.addIssue({
         code: 'custom',
@@ -65,8 +67,16 @@ export const lessonBody = z
         message: 'questions hanya untuk lesson kuis',
       });
     }
-  });
+  };
+}
+
+export const lessonBody = lessonFields.superRefine(lessonRules(true));
+// PUT lesson: kirim "questions" hanya bila soal kuis ingin diganti (ditolak jika sudah ada attempt)
+export const lessonUpdateBody = lessonFields.superRefine(lessonRules(false));
 export type LessonBody = z.infer<typeof lessonBody>;
+
+export const courseLessonParam = z.object({ id: idSchema, lessonId: idSchema });
+export type CourseLessonParam = z.infer<typeof courseLessonParam>;
 
 export const moduleLessonParam = z.object({ id: idSchema, moduleId: idSchema });
 export type ModuleLessonParam = z.infer<typeof moduleLessonParam>;

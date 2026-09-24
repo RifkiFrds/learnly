@@ -7,6 +7,7 @@ import type { idParam } from '../../middlewares/validate';
 import type {
   AdminCoursesQuery,
   CourseBody,
+  CourseLessonParam,
   EnrollBody,
   GradeAssignmentBody,
   LessonActionBody,
@@ -56,6 +57,17 @@ export const courseController = {
     const { id, moduleId } = req.valid.params as ModuleLessonParam;
     const body = req.valid.body as LessonBody;
     sendCreated(res, await courseService.addLesson(currentUser(req).userId, id, moduleId, body));
+  }) satisfies RequestHandler,
+
+  updateLesson: (async (req, res) => {
+    const { id, lessonId } = req.valid.params as CourseLessonParam;
+    const body = req.valid.body as LessonBody;
+    sendSuccess(res, await courseService.updateLesson(currentUser(req).userId, id, lessonId, body));
+  }) satisfies RequestHandler,
+
+  deleteLesson: (async (req, res) => {
+    const { id, lessonId } = req.valid.params as CourseLessonParam;
+    sendSuccess(res, await courseService.deleteLesson(currentUser(req).userId, id, lessonId));
   }) satisfies RequestHandler,
 
   submitReview: (async (req, res) => {

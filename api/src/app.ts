@@ -24,6 +24,7 @@ import { paymentRouter } from './modules/payments/payment.route';
 import { reportRouter } from './modules/reports/report.route';
 import { reviewRouter } from './modules/reviews/review.route';
 import { searchRouter } from './modules/search/search.route';
+import { settingsRouter } from './modules/settings/settings.route';
 import { tutorRouter } from './modules/tutors/tutor.route';
 import { addressRouter, learnerRouter, userRouter } from './modules/users/user.route';
 
@@ -78,6 +79,7 @@ export function createApp() {
   v1.use('/payments', paymentRouter);
   v1.use('/reviews', reviewRouter);
   v1.use('/notifications', notificationRouter);
+  v1.use('/settings', settingsRouter);
   v1.use('/admin', adminRouter);
   v1.use('/', masterDataPublicRouter); // GET /subjects, /education-levels, /categories
   app.use('/api/v1', v1);
