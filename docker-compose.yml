@@ -82,12 +82,11 @@ services:
         apk add --no-cache mariadb-client tzdata findutils gzip coreutils >/dev/null
         cp /usr/share/zoneinfo/Asia/Jakarta /etc/localtime 2>/dev/null || true
         echo "Asia/Jakarta" > /etc/timezone
-        chmod +x /usr/local/bin/backup-db.sh
         mkdir -p /backups /var/log
         touch /var/log/backup.log
         echo "[db-backup] jadwal cron:" && cat /etc/crontabs/root
-        # Jalankan sekali saat start supaya ada backup awal (opsional, tidak gagalkan container)
-        /usr/local/bin/backup-db.sh || true
+        # Script di-mount read-only; panggil lewat `sh` agar tidak butuh bit executable
+        sh /usr/local/bin/backup-db.sh || true
         # Jalankan busybox crond di foreground + tail log ke stdout
         crond -f -l 8 -L /var/log/cron.log &
         tail -F /var/log/backup.log
