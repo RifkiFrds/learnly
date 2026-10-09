@@ -1,4 +1,5 @@
 import { Errors } from '../../lib/app-error';
+import { uploadFile, type StoredFile } from '../../lib/storage';
 import { dateOnly, stringToDateColumn } from '../../lib/time';
 import { hashPassword, verifyPassword } from '../auth/auth.service';
 import { userRepository } from './user.repository';
@@ -43,6 +44,11 @@ export const userService = {
       phone: input.phone,
       passwordHash,
     });
+  },
+
+  async uploadAvatar(userId: bigint, file: StoredFile) {
+    const avatarUrl = await uploadFile(file, { folder: 'user-avatars' });
+    return userRepository.update(userId, { avatarUrl });
   },
 
   // ---- learners (FR-AUTH-06)

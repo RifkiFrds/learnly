@@ -2,6 +2,11 @@
  * Pembuat aset dummy demo (tanpa internet, tanpa foto orang, tanpa aset berhak cipta).
  * Warna mengikuti token design system (docs/10-design-system.md §4.1). Semua dokumen & struk
  * diberi watermark jelas "DUMMY / CONTOH" / "DEMO" agar tidak disangka dokumen asli.
+ *
+ * Pengecualian yang disengaja: foto profil/avatar akun demo TIDAK dibuat di sini — diambil dari
+ * internet (pravatar.cc / randomuser.me, wajah generik berlisensi bebas pakai) langsung di seed.ts
+ * (lihat `avatarAsset`), atas keputusan eksplisit agar preview produk terlihat realistis dengan foto
+ * manusia. Ini satu-satunya pengecualian kebijakan "tanpa internet, tanpa foto orang" di atas.
  */
 import { degrees, PDFDocument, rgb, StandardFonts, type PDFFont, type PDFPage } from 'pdf-lib';
 import QRCode from 'qrcode';

@@ -13,7 +13,9 @@ import type {
   UpdateReviewBody,
 } from './review.schema';
 
-type ReviewWithReviewer = Review & { reviewer: { id: bigint; fullName: string } };
+type ReviewWithReviewer = Review & {
+  reviewer: { id: bigint; fullName: string; avatarUrl: string | null };
+};
 
 function formatReview(review: ReviewWithReviewer, editableUntil?: Date) {
   return {

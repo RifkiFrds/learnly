@@ -17,6 +17,7 @@ export const searchService = {
         {
           id: card.id,
           fullName: card.user.fullName,
+          avatarUrl: card.user.avatarUrl,
           bio: card.bio ? card.bio.slice(0, 160) : null,
           hourlyRate: card.hourlyRate,
           teachingMode: card.teachingMode,

@@ -28,7 +28,7 @@ function UserRow({ user, self }: { user: AdminUser; self: boolean }) {
   return (
     <li className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:px-5">
       <div className="flex min-w-0 flex-1 items-center gap-3">
-        <Avatar name={user.fullName} size="sm" />
+        <Avatar name={user.fullName} avatarUrl={user.avatarUrl} size="sm" />
         <div className="min-w-0">
           <p className="flex flex-wrap items-center gap-2 text-body-md font-semibold text-ink-900">
             {user.fullName}

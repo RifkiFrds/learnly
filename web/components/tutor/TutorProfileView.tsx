@@ -208,7 +208,7 @@ export function TutorProfileView({ id }: { id: string }) {
     <div className="mx-auto max-w-content px-4 py-8 md:px-8">
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <header className="flex flex-col gap-5 sm:flex-row sm:items-start">
-          <Avatar name={tutor.fullName} size="lg" />
+          <Avatar name={tutor.fullName} avatarUrl={tutor.avatarUrl} size="lg" />
           <div>
             <h1 className="flex flex-wrap items-center gap-2 text-display-md">
               {tutor.fullName}

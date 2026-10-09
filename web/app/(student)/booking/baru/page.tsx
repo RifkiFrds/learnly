@@ -143,7 +143,7 @@ function BookingFlow({ tutor }: { tutor: TutorProfile }) {
   const summary = (
     <Panel title="Ringkasan booking">
       <div className="flex items-center gap-3">
-        <Avatar name={tutor.fullName} size="sm" />
+        <Avatar name={tutor.fullName} avatarUrl={tutor.avatarUrl} size="sm" />
         <div className="min-w-0">
           <p className="truncate font-sans text-body-md font-semibold text-ink-900">{tutor.fullName}</p>
           <p className="text-body-sm text-ink-500">{subject?.name ?? 'Mapel belum dipilih'}</p>

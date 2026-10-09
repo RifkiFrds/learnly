@@ -48,6 +48,8 @@ export interface DemoTutor {
   key: string;
   fullName: string;
   phone: string;
+  /** Dipakai untuk pilih foto avatar demo (lihat seed.ts `avatarAsset`) */
+  avatarGender: 'male' | 'female';
   city: CityKey;
   radiusKm: number;
   extraArea?: string;
@@ -75,6 +77,7 @@ export const TUTORS: DemoTutor[] = [
     key: 'rizky',
     fullName: 'Rizky Pratama',
     phone: '081211002201',
+    avatarGender: 'male',
     city: 'jaksel',
     radiusKm: 10,
     extraArea: 'Kebayoran Baru',
@@ -97,6 +100,7 @@ export const TUTORS: DemoTutor[] = [
     key: 'anisa',
     fullName: 'Anisa Rahmawati',
     phone: '081211002202',
+    avatarGender: 'female',
     city: 'jaktim',
     radiusKm: 8,
     bio: 'Guru Bahasa Inggris SD dan SMP sejak 2016. Anak-anak belajar lewat lagu, permainan kartu, dan cerita bergambar, sehingga berani bicara tanpa takut salah. Orang tua mendapat catatan kosakata mingguan untuk diulang di rumah.',
@@ -119,6 +123,7 @@ export const TUTORS: DemoTutor[] = [
     key: 'dimasadi',
     fullName: 'Dimas Aditya',
     phone: '081211002203',
+    avatarGender: 'male',
     city: 'jaksel',
     radiusKm: 5,
     bio: 'Software engineer di perusahaan e-commerce yang mengajar pemrograman di akhir pekan dan malam hari. Materi disusun dari proyek nyata: mulai dari kalkulator sederhana sampai web to-do list. Cocok untuk mahasiswa dan pekerja yang ingin pindah karier ke IT.',
@@ -141,6 +146,7 @@ export const TUTORS: DemoTutor[] = [
     key: 'siti',
     fullName: 'Siti Nurhaliza',
     phone: '081211002204',
+    avatarGender: 'female',
     city: 'bandung',
     radiusKm: 10,
     bio: 'Lulusan Kimia Unpad yang mengajar Kimia dan Biologi untuk SMA. Konsep stoikiometri dan genetika dipecah menjadi langkah kecil, lengkap dengan peta konsep yang bisa dibawa pulang. Terbiasa mendampingi siswa kelas 12 menjelang ujian sekolah.',
@@ -162,6 +168,7 @@ export const TUTORS: DemoTutor[] = [
     key: 'galih',
     fullName: 'Galih Prasetyo',
     phone: '081211002205',
+    avatarGender: 'male',
     city: 'bandung',
     radiusKm: 12,
     extraArea: 'Dago',
@@ -184,6 +191,7 @@ export const TUTORS: DemoTutor[] = [
     key: 'maya',
     fullName: 'Maya Kusuma',
     phone: '081211002206',
+    avatarGender: 'female',
     city: 'surabaya',
     radiusKm: 5,
     bio: 'Pengajar IELTS bersertifikat dengan skor pribadi 8.0. Membantu mahasiswa dan profesional menyiapkan studi ke luar negeri: strategi reading, template writing task 2, dan simulasi speaking dengan umpan balik langsung.',
@@ -205,6 +213,7 @@ export const TUTORS: DemoTutor[] = [
     key: 'hendra',
     fullName: 'Hendra Wijaya',
     phone: '081211002207',
+    avatarGender: 'male',
     city: 'surabaya',
     radiusKm: 10,
     bio: 'Guru Fisika SMA negeri di Surabaya selama 11 tahun. Fokus pada pemahaman grafik dan analisis soal HOTS. Siswa diajak membuat ringkasan satu halaman per bab agar mudah diulang sebelum ujian.',
@@ -226,6 +235,7 @@ export const TUTORS: DemoTutor[] = [
     key: 'laras',
     fullName: 'Laras Setyaningrum',
     phone: '081211002208',
+    avatarGender: 'female',
     city: 'yogya',
     radiusKm: 8,
     bio: 'Penulis dan pengajar Bahasa Indonesia untuk SMP–SMA. Membantu siswa menyusun teks eksposisi, argumentasi, dan cerpen dengan struktur yang rapi. Tulisan siswa dikembalikan dengan catatan di setiap paragraf, bukan sekadar nilai.',
@@ -247,6 +257,7 @@ export const TUTORS: DemoTutor[] = [
     key: 'yoga',
     fullName: 'Yoga Saputra',
     phone: '081211002209',
+    avatarGender: 'male',
     city: 'yogya',
     radiusKm: 6,
     bio: 'Asisten dosen Statistika yang mengajar Kalkulus, Statistika, dan Matematika SMA. Mahasiswa dibantu memahami konsep di balik rumus serta mengerjakan tugas analisis data dengan Excel dan R.',
@@ -268,6 +279,7 @@ export const TUTORS: DemoTutor[] = [
     key: 'rina',
     fullName: 'Rina Siregar',
     phone: '081211002210',
+    avatarGender: 'female',
     city: 'medan',
     radiusKm: 7,
     bio: 'Guru kelas SD berpengalaman yang membantu anak menguasai perkalian, pembagian, dan membaca pemahaman. Memakai metode jarimatika dan lembar kerja bergambar agar belajar terasa seperti bermain.',
@@ -289,6 +301,7 @@ export const TUTORS: DemoTutor[] = [
     key: 'andreas',
     fullName: 'Andreas Nainggolan',
     phone: '081211002211',
+    avatarGender: 'male',
     city: 'medan',
     radiusKm: 5,
     bio: 'Pengajar Bahasa Mandarin dengan sertifikat HSK 6. Mengajar percakapan sehari-hari, pinyin, dan persiapan HSK 1–4 untuk pelajar dan pekerja. Tiap pertemuan membawa 10 kosakata baru dan latihan nada.',
@@ -310,6 +323,7 @@ export const TUTORS: DemoTutor[] = [
     key: 'putu',
     fullName: 'Putu Ayu Lestari',
     phone: '081211002212',
+    avatarGender: 'female',
     city: 'denpasar',
     radiusKm: 8,
     bio: 'Mantan pemandu wisata yang kini mengajar Bahasa Inggris percakapan untuk anak SD–SMP. Anak-anak berlatih memperkenalkan diri, bercerita tentang keluarga, dan memesan makanan dalam bahasa Inggris.',
@@ -331,6 +345,7 @@ export const TUTORS: DemoTutor[] = [
     key: 'fitri',
     fullName: 'Fitri Rahman',
     phone: '081211002213',
+    avatarGender: 'female',
     city: 'makassar',
     radiusKm: 10,
     bio: 'Lulusan Biologi Unhas yang menyiapkan siswa SMA untuk UTBK Saintek. Membuat bank soal per topik dan target skor mingguan yang realistis.',
@@ -352,6 +367,7 @@ export const TUTORS: DemoTutor[] = [
     key: 'kevin',
     fullName: 'Kevin Halim',
     phone: '081211002214',
+    avatarGender: 'male',
     city: 'denpasar',
     radiusKm: 6,
     bio: 'Desainer grafis lepas untuk hotel dan UMKM di Bali. Mengajar dasar desain: komposisi, tipografi, warna, dan membuat materi promosi dengan aplikasi gratis.',
@@ -373,6 +389,7 @@ export const TUTORS: DemoTutor[] = [
     key: 'nuraini',
     fullName: 'Nur Aini',
     phone: '081211002215',
+    avatarGender: 'female',
     city: 'makassar',
     radiusKm: 5,
     bio: 'Mengajar IPA dan Matematika untuk anak SD di sekitar Panakkukang.',
@@ -403,6 +420,8 @@ export interface DemoAccount {
   fullName: string;
   phone: string;
   role: 'parent' | 'student';
+  /** Dipakai untuk pilih foto avatar demo (lihat seed.ts `avatarAsset`) */
+  avatarGender: 'male' | 'female';
   children?: DemoLearner[];
   /** siswa mandiri: profil diri */
   self?: { level: string; birth: string };
@@ -415,6 +434,7 @@ export const ACCOUNTS: DemoAccount[] = [
     fullName: 'Sari Wulandari',
     phone: '081311004401',
     role: 'parent',
+    avatarGender: 'female',
     children: [
       { key: 'dimas', fullName: 'Dimas Wicaksono', level: 'sma', birth: '2009-04-12' },
       { key: 'alya', fullName: 'Alya Wicaksono', level: 'smp', birth: '2012-09-03' },
@@ -426,6 +446,7 @@ export const ACCOUNTS: DemoAccount[] = [
     fullName: 'Bambang Sutrisno',
     phone: '081311004402',
     role: 'parent',
+    avatarGender: 'male',
     children: [
       { key: 'raka', fullName: 'Raka Sutrisno', level: 'smp', birth: '2011-02-20' },
       { key: 'nadia', fullName: 'Nadia Sutrisno', level: 'sd', birth: '2015-06-08' },
@@ -438,6 +459,7 @@ export const ACCOUNTS: DemoAccount[] = [
     fullName: 'Dewi Lestari',
     phone: '081311004403',
     role: 'parent',
+    avatarGender: 'female',
     children: [{ key: 'kirana', fullName: 'Kirana Putri', level: 'sma', birth: '2008-12-01' }],
     address: { label: 'Rumah', fullAddress: 'Jl. Raya Darmo Permai III No. 21, Sukomanunggal, Surabaya', detailNote: 'Satpam kompleks minta kartu identitas', lat: -7.2702, lng: 112.7002 },
   },
@@ -446,6 +468,7 @@ export const ACCOUNTS: DemoAccount[] = [
     fullName: 'Agus Hermawan',
     phone: '081311004404',
     role: 'parent',
+    avatarGender: 'male',
     children: [
       { key: 'fajar', fullName: 'Fajar Hermawan', level: 'sma', birth: '2009-01-25' },
       { key: 'tiara', fullName: 'Tiara Hermawan', level: 'smp', birth: '2012-05-30' },
@@ -457,6 +480,7 @@ export const ACCOUNTS: DemoAccount[] = [
     fullName: 'Putri Maharani',
     phone: '081311004405',
     role: 'student',
+    avatarGender: 'female',
     self: { level: 'kuliah', birth: '2004-03-17' },
     address: { label: 'Kos', fullAddress: 'Jl. Pogung Baru Blok F No. 3, Sinduadi, Sleman, Yogyakarta', detailNote: 'Kos putri pintu biru', lat: -7.7626, lng: 110.3752 },
   },
@@ -465,6 +489,7 @@ export const ACCOUNTS: DemoAccount[] = [
     fullName: 'Arif Hidayat',
     phone: '081311004406',
     role: 'student',
+    avatarGender: 'male',
     self: { level: 'sma', birth: '2008-07-09' },
     address: { label: 'Rumah', fullAddress: 'Jl. Setia Budi No. 45, Medan Selayang, Medan', detailNote: 'Di samping toko fotokopi', lat: 3.5669, lng: 98.6435 },
   },
@@ -473,6 +498,7 @@ export const ACCOUNTS: DemoAccount[] = [
     fullName: 'Clara Wijaya',
     phone: '081311004407',
     role: 'student',
+    avatarGender: 'female',
     self: { level: 'umum', birth: '1998-10-22' },
     address: { label: 'Apartemen', fullAddress: 'Apartemen Kalibata City Tower Jasmine, Pancoran, Jakarta Selatan', detailNote: 'Tunggu di lobi, lantai 12', lat: -6.2567, lng: 106.8549 },
   },

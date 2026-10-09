@@ -23,7 +23,7 @@ export function UserMenu({ showDashboard = false }: { showDashboard?: boolean })
         className="flex min-h-11 items-center gap-2 rounded-lg px-1.5 text-left hover:bg-surface-muted"
         aria-label={`Menu akun ${user.fullName}`}
       >
-        <Avatar name={user.fullName} size="sm" />
+        <Avatar name={user.fullName} avatarUrl={user.avatarUrl} size="sm" />
         <span className="hidden max-w-36 truncate text-body-sm font-semibold text-ink-900 md:inline">{user.fullName}</span>
         <ChevronDown className="hidden size-4 text-ink-500 md:inline" aria-hidden />
       </DropdownMenuTrigger>

@@ -67,6 +67,7 @@ export function formatTutorProfile(profile: TutorProfileFull, isPrivate: boolean
     id: profile.id,
     userId: profile.userId,
     fullName: profile.user.fullName,
+    avatarUrl: profile.user.avatarUrl,
     ...(isPrivate
       ? {
           email: profile.user.email,

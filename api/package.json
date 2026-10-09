@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "dev:local": "tsx watch --env-file=.env.local src/server.ts",
     "build": "prisma generate && tsc -p tsconfig.build.json",
     "start": "prisma migrate deploy && node dist/scripts/seed.js && node dist/server.js",
     "typecheck": "tsc --noEmit",

@@ -5,6 +5,9 @@
  *
  * Tanpa internet, tanpa foto orang/AI face, tanpa aset berhak cipta. Video tidak dibuat
  * (ffmpeg tidak dipakai) — kursus demo memakai lesson bacaan + PDF, kuis, dan tugas.
+ *
+ * Pengecualian: avatar akun demo TIDAK di sini. Diambil langsung dari internet (pravatar.cc /
+ * randomuser.me) saat demo-seed.ts jalan, lalu diunggah ke Cloudinary — lihat seed.ts `avatarAsset`.
  */
 import fs from 'node:fs/promises';
 import path from 'node:path';

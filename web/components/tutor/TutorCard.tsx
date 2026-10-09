@@ -9,7 +9,7 @@ export function TutorCard({ tutor }: { tutor: TutorCardData }) {
   return (
     <article className="group relative flex min-w-0 flex-col gap-4 rounded-lg border border-border bg-surface p-5 transition-shadow hover:shadow-md">
       <div className="flex items-start gap-4">
-        <Avatar name={tutor.fullName} />
+        <Avatar name={tutor.fullName} avatarUrl={tutor.avatarUrl} />
         <div className="min-w-0 flex-1">
           <h3 className="flex min-w-0 items-center gap-1.5 font-sans text-heading-md">
             <Link href={`/tutor/${tutor.id}`} className="min-w-0 truncate after:absolute after:inset-0 after:content-['']">

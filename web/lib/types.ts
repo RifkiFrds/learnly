@@ -54,6 +54,7 @@ export interface User {
   email: string;
   fullName: string;
   phone: string | null;
+  avatarUrl: string | null;
   role: Role;
   status: 'active' | 'suspended';
   emailVerifiedAt: string | null;
@@ -128,7 +129,8 @@ export interface ReviewItem {
   repliedAt: string | null;
   createdAt: string;
   reviewerName?: string;
-  reviewer?: { id: number; fullName: string };
+  reviewerAvatarUrl?: string | null;
+  reviewer?: { id: number; fullName: string; avatarUrl?: string | null };
   subjectName?: string;
   bookingId?: number;
   isHidden?: boolean;
@@ -138,6 +140,7 @@ export interface TutorProfile {
   id: number;
   userId: number;
   fullName: string;
+  avatarUrl?: string | null;
   email?: string;
   phone?: string | null;
   autoAccept?: boolean;
@@ -166,6 +169,7 @@ export interface TutorProfile {
 export interface TutorCard {
   id: number;
   fullName: string;
+  avatarUrl: string | null;
   bio: string | null;
   hourlyRate: number;
   teachingMode: TeachingMode;
@@ -613,6 +617,7 @@ export interface AdminUser {
   email: string;
   fullName: string;
   phone: string | null;
+  avatarUrl: string | null;
   role: Role;
   status: 'active' | 'suspended';
   emailVerifiedAt: string | null;
@@ -630,7 +635,7 @@ export interface AdminReview {
   repliedAt: string | null;
   isHidden: boolean;
   createdAt: string;
-  reviewer: { id: number; fullName: string; email: string };
+  reviewer: { id: number; fullName: string; email: string; avatarUrl?: string | null };
   target: { type: 'tutor'; tutorProfileId: number; name: string } | { type: 'course'; courseId: number; slug: string; name: string } | null;
 }
 

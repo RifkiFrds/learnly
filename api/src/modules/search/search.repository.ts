@@ -112,7 +112,7 @@ export const searchRepository = {
     return prisma.tutorProfile.findMany({
       where: { id: { in: ids } },
       include: {
-        user: { select: { fullName: true } },
+        user: { select: { fullName: true, avatarUrl: true } },
         subjects: { include: { subject: true } },
         educationLevels: { include: { educationLevel: true } },
         serviceAreas: { select: { areaType: true, areaName: true } },

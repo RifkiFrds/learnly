@@ -83,6 +83,7 @@ Catatan implementasi:
 | Method | Path | Role | Deskripsi |
 |---|---|---|---|
 | PATCH | `/users/me` | authenticated | Update profil sendiri |
+| POST | `/users/me/avatar` | authenticated | Unggah/ganti foto profil (PNG/JPG/WEBP, maks 5 MB) |
 | GET | `/learners` | student, parent | Daftar learner milik akun (diri sendiri/anak) |
 | POST | `/learners` | parent | Tambah profil anak |
 | PATCH | `/learners/:id` | parent (owner) | Edit profil anak |

@@ -40,6 +40,27 @@ async function asset(relative: string, folder: string, isPrivate = false): Promi
   return uploadFile({ buffer, mimeType: MIME[path.extname(relative)] ?? 'application/octet-stream' }, { folder, isPrivate });
 }
 
+/**
+ * Foto profil akun demo — satu-satunya aset demo yang diambil dari internet (lihat catatan
+ * kebijakan di assets.ts). randomuser.me/api/portraits/{men,women}/{0-99}.jpg adalah set foto
+ * wajah generik (model berbayar, bebas dipakai untuk uji coba/demo) yang stabil per URL, jadi
+ * index dipilih deterministik dari `key` supaya seed ulang selalu menghasilkan avatar yang sama.
+ */
+function avatarIndex(key: string): number {
+  let hash = 0;
+  for (const char of key) hash = (hash * 31 + char.charCodeAt(0)) % 100;
+  return hash;
+}
+
+async function avatarAsset(key: string, gender: 'male' | 'female'): Promise<string> {
+  const index = avatarIndex(key);
+  const url = `https://randomuser.me/api/portraits/${gender === 'male' ? 'men' : 'women'}/${index}.jpg`;
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Gagal mengambil foto avatar demo dari ${url}: HTTP ${response.status}`);
+  const buffer = Buffer.from(await response.arrayBuffer());
+  return uploadFile({ buffer, mimeType: 'image/jpeg' }, { folder: 'user-avatars' });
+}
+
 /** Hapus data demo lama (akun @demo.learnly.id, kursus demo, dan semua transaksi yang terkait) */
 export async function purgeDemo(prisma: PrismaClient) {
   const users = await prisma.user.findMany({ where: { email: { endsWith: `@${DEMO_DOMAIN}` } }, select: { id: true } });
@@ -122,7 +143,16 @@ export async function seedDemo(prisma: PrismaClient) {
 
   // ---------- admin demo ----------
   const admin = await prisma.user.create({
-    data: { email: demoEmail('admin'), passwordHash, fullName: 'Nadia Admin Learnly', phone: '081100000001', role: 'admin', emailVerifiedAt: now, createdAt: new Date(now.getTime() - 200 * 24 * HOUR) },
+    data: {
+      email: demoEmail('admin'),
+      passwordHash,
+      fullName: 'Nadia Admin Learnly',
+      phone: '081100000001',
+      avatarUrl: await avatarAsset('admin', 'female'),
+      role: 'admin',
+      emailVerifiedAt: now,
+      createdAt: new Date(now.getTime() - 200 * 24 * HOUR),
+    },
   });
 
   // ---------- tutor ----------
@@ -146,6 +176,7 @@ export async function seedDemo(prisma: PrismaClient) {
         passwordHash,
         fullName: tutor.fullName,
         phone: tutor.phone,
+        avatarUrl: await avatarAsset(tutor.key, tutor.avatarGender),
         role: 'tutor',
         emailVerifiedAt: joined,
         createdAt: joined,
@@ -198,6 +229,7 @@ export async function seedDemo(prisma: PrismaClient) {
         passwordHash,
         fullName: account.fullName,
         phone: account.phone,
+        avatarUrl: await avatarAsset(account.key, account.avatarGender),
         role: account.role,
         emailVerifiedAt: joined,
         createdAt: joined,

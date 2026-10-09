@@ -46,7 +46,7 @@ export const adminRepository = {
     return prisma.$transaction([
       prisma.review.findMany({
         where,
-        include: { reviewer: { select: { id: true, fullName: true, email: true } } },
+        include: { reviewer: { select: { id: true, fullName: true, email: true, avatarUrl: true } } },
         orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         skip,
         take,

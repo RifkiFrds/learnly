@@ -3,7 +3,15 @@ import { prisma } from '../../lib/prisma';
 
 export const tutorProfileInclude = {
   user: {
-    select: { id: true, fullName: true, email: true, phone: true, status: true, createdAt: true },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      phone: true,
+      avatarUrl: true,
+      status: true,
+      createdAt: true,
+    },
   },
   certifications: { orderBy: { id: 'asc' } },
   subjects: { include: { subject: true } },
@@ -165,11 +173,13 @@ export const tutorRepository = {
           created_at: Date;
           booking_id: bigint;
           reviewer_name: string;
+          reviewer_avatar_url: string | null;
           subject_name: string;
         }[]
       >(Prisma.sql`
         SELECT r.id, r.rating, r.comment, r.reply_text, r.replied_at, r.created_at,
-               b.id AS booking_id, u.full_name AS reviewer_name, s.name AS subject_name
+               b.id AS booking_id, u.full_name AS reviewer_name, u.avatar_url AS reviewer_avatar_url,
+               s.name AS subject_name
         FROM reviews r
         JOIN bookings b ON b.id = r.reviewable_id AND r.reviewable_type = 'tutor_booking'
         JOIN users u ON u.id = r.reviewer_user_id
@@ -194,6 +204,7 @@ export const tutorRepository = {
         bookingId: row.booking_id,
         subjectName: row.subject_name,
         reviewerName: row.reviewer_name,
+        reviewerAvatarUrl: row.reviewer_avatar_url,
       })),
       total: Number(countRows[0]?.total ?? 0),
     };

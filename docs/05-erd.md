@@ -88,6 +88,7 @@ CREATE TABLE users (
   password_hash     VARCHAR(255) NOT NULL,
   full_name         VARCHAR(191) NOT NULL,
   phone             VARCHAR(30) NULL,
+  avatar_url        VARCHAR(500) NULL, -- foto profil (Cloudinary); diisi lewat PATCH /users/me/avatar
   role              ENUM('student','parent','tutor','admin') NOT NULL,
   status            ENUM('active','suspended') NOT NULL DEFAULT 'active',
   email_verified_at DATETIME NULL,

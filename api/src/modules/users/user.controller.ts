@@ -1,5 +1,6 @@
 import type { RequestHandler } from 'express';
 import type { z } from 'zod';
+import { Errors } from '../../lib/app-error';
 import { sendCreated, sendSuccess } from '../../lib/response';
 import { currentUser } from '../../middlewares/auth.middleware';
 import type { idParam } from '../../middlewares/validate';
@@ -18,6 +19,11 @@ export const userController = {
   updateMe: (async (req, res) => {
     const body = req.valid.body as UpdateMeBody;
     sendSuccess(res, await userService.updateMe(currentUser(req).userId, body));
+  }) satisfies RequestHandler,
+
+  uploadAvatar: (async (req, res) => {
+    if (!req.uploadedFile) throw Errors.validation('Foto profil wajib diunggah');
+    sendSuccess(res, await userService.uploadAvatar(currentUser(req).userId, req.uploadedFile));
   }) satisfies RequestHandler,
 
   listLearners: (async (req, res) => {

@@ -2,19 +2,70 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { Panel } from '@/components/common/Bits';
+import { Avatar, Panel } from '@/components/common/Bits';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Field, FormError } from '@/components/form/Field';
+import { FileInput } from '@/components/form/FileInput';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { api } from '@/lib/api-client';
+import { useUploadAvatar } from '@/hooks/api/account';
+import { api, errorMessage } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth';
 import { applyApiError, passwordField, phoneField } from '@/lib/forms';
 import { ROLE_LABEL } from '@/lib/status';
+
+function AvatarPanel({ user }: { user: { fullName: string; avatarUrl: string | null } }) {
+  const upload = useUploadAvatar();
+  const [file, setFile] = useState<File | null>(null);
+  const [error, setError] = useState<string | undefined>();
+  const previewUrl = useMemo(() => (file ? URL.createObjectURL(file) : null), [file]);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
+  async function save() {
+    if (!file) return setError('Pilih foto dulu.');
+    try {
+      await upload.mutateAsync(file);
+      toast.success('Foto profil diperbarui.');
+      setFile(null);
+    } catch (err) {
+      setError(errorMessage(err));
+    }
+  }
+
+  return (
+    <Panel title="Foto profil">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+        <Avatar name={user.fullName} avatarUrl={previewUrl ?? user.avatarUrl} size="lg" />
+        <div className="flex-1 space-y-3">
+          <FileInput
+            label="Unggah foto baru"
+            accept={['image/png', 'image/jpeg', 'image/webp']}
+            maxSizeMb={5}
+            file={file}
+            onFile={(next, fileError) => {
+              setFile(next);
+              setError(fileError);
+            }}
+            error={error}
+            hint="Format persegi lebih pas untuk avatar."
+          />
+          <Button type="button" variant="secondary" disabled={upload.isPending || !file} onClick={save}>
+            {upload.isPending ? 'Mengunggah…' : 'Ganti foto'}
+          </Button>
+        </div>
+      </div>
+    </Panel>
+  );
+}
 
 const profileSchema = z.object({
   fullName: z.string().trim().min(2, 'Nama minimal 2 karakter').max(191),
@@ -68,6 +119,7 @@ export default function AccountPage() {
     <div className="max-w-2xl">
       <PageHeader title="Pengaturan akun" description={`${ROLE_LABEL[user.role]} · ${user.email}`} />
       <div className="space-y-6">
+        <AvatarPanel user={user} />
         <Panel title="Data diri">
           <form onSubmit={saveProfile} className="space-y-4" noValidate>
             <FormError message={profileError} />

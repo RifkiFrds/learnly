@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../../middlewares/auth.middleware';
 import { authorize } from '../../middlewares/rbac.middleware';
+import { acceptUpload } from '../../middlewares/upload';
 import { idParam, validate } from '../../middlewares/validate';
 import { userController } from './user.controller';
 import {
@@ -14,6 +15,12 @@ import {
 // /users
 export const userRouter = Router();
 userRouter.patch('/me', authenticate, validate({ body: updateMeBody }), userController.updateMe);
+userRouter.post(
+  '/me/avatar',
+  authenticate,
+  ...acceptUpload({ allowed: ['image/png', 'image/jpeg', 'image/webp'] }),
+  userController.uploadAvatar,
+);
 
 // /learners
 export const learnerRouter = Router();

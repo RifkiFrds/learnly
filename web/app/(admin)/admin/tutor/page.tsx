@@ -47,7 +47,7 @@ function TutorRow({ tutor }: { tutor: AdminTutor }) {
     <li>
       <details className="group rounded-lg border border-border bg-surface open:border-primary-600/40">
         <summary className="flex min-h-16 cursor-pointer list-none items-center gap-4 p-4 sm:px-5 [&::-webkit-details-marker]:hidden">
-          <Avatar name={tutor.fullName} />
+          <Avatar name={tutor.fullName} avatarUrl={tutor.avatarUrl} />
           <div className="min-w-0 flex-1">
             <p className="flex flex-wrap items-center gap-2 font-sans text-body-md font-semibold text-ink-900">
               {tutor.fullName}

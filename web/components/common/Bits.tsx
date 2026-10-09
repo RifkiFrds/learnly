@@ -18,9 +18,29 @@ export function Logo({ href = '/', className }: { href?: string; className?: str
   );
 }
 
-/** Avatar inisial (belum ada foto profil di skema) */
-export function Avatar({ name, size = 'md', className }: { name: string; size?: 'sm' | 'md' | 'lg'; className?: string }) {
+/** Avatar — foto profil jika ada (avatarUrl), fallback ke inisial */
+export function Avatar({
+  name,
+  avatarUrl,
+  size = 'md',
+  className,
+}: {
+  name: string;
+  avatarUrl?: string | null;
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+}) {
   const sizes = { sm: 'size-9 text-body-sm', md: 'size-12 text-body-md', lg: 'size-20 text-heading-lg' };
+  if (avatarUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- URL eksternal (Cloudinary) tanpa konfigurasi domain
+      <img
+        src={avatarUrl}
+        alt={name}
+        className={cn('inline-flex shrink-0 rounded-full object-cover', sizes[size], className)}
+      />
+    );
+  }
   return (
     <span
       aria-hidden

@@ -7,7 +7,7 @@ export const reviewRepository = {
   findById(id: bigint) {
     return prisma.review.findUnique({
       where: { id },
-      include: { reviewer: { select: { id: true, fullName: true } } },
+      include: { reviewer: { select: { id: true, fullName: true, avatarUrl: true } } },
     });
   },
 
@@ -20,7 +20,7 @@ export const reviewRepository = {
   create(db: Db, data: Prisma.ReviewUncheckedCreateInput) {
     return db.review.create({
       data,
-      include: { reviewer: { select: { id: true, fullName: true } } },
+      include: { reviewer: { select: { id: true, fullName: true, avatarUrl: true } } },
     });
   },
 
@@ -28,7 +28,7 @@ export const reviewRepository = {
     return db.review.update({
       where: { id },
       data,
-      include: { reviewer: { select: { id: true, fullName: true } } },
+      include: { reviewer: { select: { id: true, fullName: true, avatarUrl: true } } },
     });
   },
 
@@ -63,7 +63,7 @@ export const reviewRepository = {
     return prisma.$transaction([
       prisma.review.findMany({
         where,
-        include: { reviewer: { select: { id: true, fullName: true } } },
+        include: { reviewer: { select: { id: true, fullName: true, avatarUrl: true } } },
         orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         skip,
         take,

@@ -1,24 +1,6 @@
-import { BookOpen, MapPin, ShieldCheck, Video } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 import { HeroSearch } from '@/components/landing/HeroSearch';
 import { FeaturedTutors, PopularCourses, SubjectGrid } from '@/components/landing/LandingSections';
-
-const LEARNING_MODES = [
-  {
-    icon: BookOpen,
-    title: 'Kursus online',
-    description: 'Video, modul, dan kuis yang bisa kamu pelajari kapan saja. Selesaikan untuk dapat sertifikat.',
-  },
-  {
-    icon: Video,
-    title: 'Tutor online',
-    description: 'Sesi terjadwal lewat video call bersama tutor pilihanmu, tanpa terbatas jarak.',
-  },
-  {
-    icon: MapPin,
-    title: 'Tutor datang ke rumah',
-    description: 'Pilih tutor di sekitarmu dan pantau statusnya, dari berangkat sampai tiba di lokasi.',
-  },
-];
 
 const STEPS = [
   ['Cari & bandingkan', 'Lihat profil, tarif, jadwal kosong, dan ulasan sebelum memesan.'],
@@ -44,25 +26,15 @@ export default function HomePage() {
           </div>
         </div>
 
-        <aside className="lg:col-span-5 lg:pt-10" aria-labelledby="modes-title">
-          <div className="rounded-lg border border-border bg-surface">
-            <h2 id="modes-title" className="border-b border-border px-6 py-4 font-sans text-heading-md">
-              Tiga cara belajar di Learnly
-            </h2>
-            <ul className="divide-y divide-border">
-              {LEARNING_MODES.map(({ icon: Icon, title, description }) => (
-                <li key={title} className="flex gap-4 px-6 py-5">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-100 text-primary-700">
-                    <Icon className="size-5" aria-hidden />
-                  </span>
-                  <div>
-                    <h3 className="font-sans text-body-md font-semibold">{title}</h3>
-                    <p className="mt-1 text-body-sm text-ink-500">{description}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <p className="flex items-start gap-2 rounded-b-lg bg-surface-muted px-6 py-4 text-body-sm text-ink-700">
+        <aside className="lg:col-span-5 lg:pt-10">
+          <div className="overflow-hidden rounded-lg border border-border bg-surface">
+            {/* eslint-disable-next-line @next/next/no-img-element -- pola existing: img native, lihat Bits.tsx Avatar */}
+            <img
+              src="/hero-learnly.jpg"
+              alt="Tutor dan siswa Learnly berdiskusi sambil memantau progres kursus dan jadwal sesi"
+              className="aspect-[4/5] w-full object-cover sm:aspect-[4/3]"
+            />
+            <p className="flex items-start gap-2 bg-surface-muted px-6 py-4 text-body-sm text-ink-700">
               <ShieldCheck className="mt-0.5 size-4 shrink-0 text-success-600" aria-hidden />
               Tutor baru tampil di pencarian setelah dokumennya diverifikasi tim Learnly.
             </p>

@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
-import type { Address, Earnings, Learner, TutorProfile } from '@/lib/types';
+import type { Address, Earnings, Learner, Me, TutorProfile } from '@/lib/types';
 
 // ---------- learner (anak) & alamat — siswa/orang tua ----------
 
@@ -62,6 +62,19 @@ export function useDeleteAddress() {
   return useMutation({
     mutationFn: (id: number) => api.delete(`/addresses/${id}`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['addresses'] }),
+  });
+}
+
+/** Unggah/ganti foto profil (semua role) — PATCH-like via /users/me/avatar, hasil langsung sinkron ke cache ['me'] */
+export function useUploadAvatar() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (file: File) => {
+      const form = new FormData();
+      form.append('file', file);
+      return api.upload<Me>('/users/me/avatar', form);
+    },
+    onSuccess: (me) => queryClient.setQueryData(['me'], me),
   });
 }
 

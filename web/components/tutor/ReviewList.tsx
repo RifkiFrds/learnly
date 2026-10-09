@@ -5,10 +5,11 @@ import type { ReviewItem } from '@/lib/types';
 
 export function ReviewCard({ review, footer }: { review: ReviewItem; footer?: React.ReactNode }) {
   const name = review.reviewerName ?? review.reviewer?.fullName ?? 'Pengguna Learnly';
+  const avatarUrl = review.reviewerAvatarUrl ?? review.reviewer?.avatarUrl;
   return (
     <article className="rounded-lg border border-border bg-surface p-5">
       <header className="flex items-start gap-3">
-        <Avatar name={name} size="sm" />
+        <Avatar name={name} avatarUrl={avatarUrl} size="sm" />
         <div className="min-w-0 flex-1">
           <p className="text-body-sm font-semibold text-ink-900">{name}</p>
           <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1">
