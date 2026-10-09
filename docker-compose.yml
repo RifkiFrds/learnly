@@ -41,6 +41,8 @@ services:
       NODE_ENV: production
       PORT: 5000
       DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@learnly_db:3306/${MYSQL_DATABASE}
+      # Izinkan demo-seed jalan otomatis saat container start (lihat package.json → "start")
+      ALLOW_DEMO_SEED: "true"
     volumes:
       - learnly_uploads:/app/uploads
     depends_on:
@@ -50,6 +52,45 @@ services:
       - learnly-network
       - proxy
     mem_limit: 350m
+
+  db-backup:
+    image: alpine:3.20
+    container_name: learnly_db_backup
+    restart: unless-stopped
+    environment:
+      MYSQL_HOST: learnly_db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      BACKUP_RETENTION_DAYS: "30"
+      TZ: Asia/Jakarta
+    volumes:
+      - ./ops/backup/backup-db.sh:/usr/local/bin/backup-db.sh:ro
+      - ./ops/backup/crontab:/etc/crontabs/root:ro
+      - learnly_backups:/backups
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - learnly-network
+    mem_limit: 128m
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        # Install mysql-client (untuk mysqldump), tzdata, findutils, gzip
+        apk add --no-cache mariadb-client tzdata findutils gzip coreutils >/dev/null
+        cp /usr/share/zoneinfo/Asia/Jakarta /etc/localtime 2>/dev/null || true
+        echo "Asia/Jakarta" > /etc/timezone
+        chmod +x /usr/local/bin/backup-db.sh
+        mkdir -p /backups /var/log
+        touch /var/log/backup.log
+        echo "[db-backup] jadwal cron:" && cat /etc/crontabs/root
+        # Jalankan sekali saat start supaya ada backup awal (opsional, tidak gagalkan container)
+        /usr/local/bin/backup-db.sh || true
+        # Jalankan busybox crond di foreground + tail log ke stdout
+        crond -f -l 8 -L /var/log/cron.log &
+        tail -F /var/log/backup.log
 
   web:
     build:
@@ -77,6 +118,8 @@ volumes:
     name: learnly_mysql_data
   learnly_uploads:
     name: learnly_uploads_data
+  learnly_backups:
+    name: learnly_backups_data
 
 networks:
   learnly-network:

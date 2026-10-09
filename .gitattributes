@@ -1,0 +1,3 @@
+# Pastikan shell script & crontab yang dieksekusi di container Linux selalu LF
+*.sh text eol=lf
+ops/backup/crontab text eol=lf

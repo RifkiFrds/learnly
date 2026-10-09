@@ -38,6 +38,9 @@ RUN npm ci --only=production && npx prisma generate
 # Salin hasil build dari stage builder (sesuaikan dengan output folder tsconfig, misal dist/)
 COPY --from=builder /app/dist ./dist
 
+# Salin aset demo yang dibutuhkan oleh demo-seed (foto profil, pdf materi, dsb)
+COPY --from=builder /app/seed-assets ./seed-assets
+
 # Port yang digunakan API
 EXPOSE 5000
 
