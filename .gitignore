@@ -1,10 +1,11 @@
 # Dependencies
 node_modules/
 
-# Env — hanya .env.example yang boleh di-commit
+# Env — hanya file .env.example (termasuk .env.production.example) yang boleh di-commit
 .env
 .env.*
 !.env.example
+!.env.production.example
 
 # Build output
 dist/
