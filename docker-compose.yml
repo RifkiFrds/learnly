@@ -51,7 +51,8 @@ services:
     networks:
       - learnly-network
       - proxy
-    mem_limit: 350m
+    # 350m terlalu kecil saat demo-seed (load aset + bcrypt banyak user). Set 1g.
+    mem_limit: 1g
 
   db-backup:
     image: alpine:3.20
