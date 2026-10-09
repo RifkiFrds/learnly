@@ -1,5 +1,5 @@
-# Dev lokal saja: hanya MySQL. API & web dijalankan langsung dengan `npm run dev`.
-# Lihat docs/03-tech-stack.md — tidak ada Redis/queue/service lain.
+version: '3.8'
+
 services:
   mysql:
     image: mysql:8.4
@@ -8,9 +8,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: learnly_root
       MYSQL_DATABASE: learnly
-      # Dev pakai user root: `prisma migrate dev` butuh hak CREATE DATABASE untuk shadow database
     ports:
-      # Host 3307 agar tidak bentrok dengan MySQL lokal yang mungkin sudah jalan di 3306
       - "3307:3306"
     volumes:
       - learnly_mysql_data:/var/lib/mysql
@@ -19,6 +17,54 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
+    networks:
+      - learnly_network
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: learnly_api
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - DATABASE_URL=mysql://root:learnly_root@mysql:3306/learnly
+      - JWT_ACCESS_SECRET=ini_secret_access_token_minimal_32_karakter_yang_panjang
+      - JWT_REFRESH_SECRET=ini_secret_refresh_token_minimal_32_karakter_yang_panjang
+      - CORS_ORIGIN=http://localhost:3000
+      - STORAGE_DRIVER=local
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - learnly_network
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: /api/v1
+        API_PROXY_TARGET: http://api:4000
+    container_name: learnly_web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_BASE_URL=/api/v1
+      - API_PROXY_TARGET=http://api:4000
+    depends_on:
+      - api
+    networks:
+      - learnly_network
 
 volumes:
   learnly_mysql_data:
+
+networks:
+  learnly_network:
+    driver: bridge
