@@ -36,7 +36,7 @@ export default function HomePage() {
             />
             <p className="flex items-start gap-2 bg-surface-muted px-6 py-4 text-body-sm text-ink-700">
               <ShieldCheck className="mt-0.5 size-4 shrink-0 text-success-600" aria-hidden />
-              Tutor baru tampil di pencarian setelah dokumennya diverifikasi tim Learnly.
+              Setiap tutor melewati verifikasi dokumen ketat sebelum boleh mengajar — kualitas yang terjamin, bukan janji kosong.
             </p>
           </div>
         </aside>

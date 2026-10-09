@@ -5,14 +5,30 @@ import { Button } from '@/components/ui/button';
 import { initials } from '@/lib/format';
 import type { PageMeta } from '@/lib/types';
 
-/** Wordmark Learnly */
+/**
+ * Mark Learnly — badge ink-900 dengan glyph "L" (stroke warna background) dan titik aksen
+ * primary-600, menggemakan tanda titik di wordmark. Warna brand tetap (bukan token tema),
+ * konsisten dengan wordmark yang juga hardcode warna lewat className Tailwind.
+ */
+export function LogoMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 36 36" className={cn('size-8', className)} aria-hidden>
+      <rect x="1" y="1" width="34" height="34" rx="10" fill="#231F1A" />
+      <path d="M12 10V24H22" stroke="#FAF8F4" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <circle cx="24.5" cy="24" r="2.75" fill="#C15F3C" />
+    </svg>
+  );
+}
+
+/** Wordmark Learnly (mark + logotype) */
 export function Logo({ href = '/', className }: { href?: string; className?: string }) {
   return (
     <Link
       href={href}
-      className={cn('rounded-sm font-display text-heading-lg text-ink-900', className)}
+      className={cn('inline-flex items-center gap-2 rounded-sm font-display text-heading-lg text-ink-900', className)}
       aria-label="Learnly — ke beranda"
     >
+      <LogoMark />
       Learnly<span className="text-primary-600">.</span>
     </Link>
   );
