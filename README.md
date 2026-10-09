@@ -191,3 +191,5 @@ Import `api/postman/learnly.postman_collection.json` + `api/postman/learnly-loca
 - **File storage**: Cloudinary (free tier)
 
 Sengaja disederhanakan untuk skala proyek/tugas — tidak ada servis berbayar yang wajib di-provision. Detail lengkap & alasan pemilihan ada di [docs/03-tech-stack.md](docs/03-tech-stack.md).
+
+<!-- CI/CD test -->
