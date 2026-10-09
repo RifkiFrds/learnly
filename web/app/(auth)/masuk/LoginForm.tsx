@@ -81,7 +81,6 @@ export function LoginForm() {
         </Link>
       </p>
 
-      {process.env.NODE_ENV !== 'production' && (
         <details className="mt-6 rounded-lg bg-surface-muted px-4 py-3 text-body-sm text-ink-700">
           <summary className="cursor-pointer font-semibold">Akun demo</summary>
           <ul className="mt-2 space-y-1 font-mono text-[0.8125rem]">
@@ -92,7 +91,6 @@ export function LoginForm() {
             <li>Admin: admin@demo.learnly.id</li>
           </ul>
         </details>
-      )}
     </div>
   );
 }
