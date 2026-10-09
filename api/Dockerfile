@@ -39,7 +39,7 @@ RUN npm ci --only=production && npx prisma generate
 COPY --from=builder /app/dist ./dist
 
 # Port yang digunakan API
-EXPOSE 4000
+EXPOSE 5000
 
 # Jalankan server
-CMD ["node", "dist/server.js"]
+CMD ["npm", "run", "start"]

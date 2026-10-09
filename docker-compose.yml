@@ -1,24 +1,34 @@
-version: '3.8'
-
 services:
   mysql:
     image: mysql:8.4
-    container_name: learnly_mysql
+    container_name: learnly_db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: learnly_root
-      MYSQL_DATABASE: learnly
-    ports:
-      - "3307:3306"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: Asia/Jakarta
     volumes:
-      - learnly_mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-plearnly_root"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
+      - mysql_data:/var/lib/mysql
     networks:
-      - learnly_network
+      - learnly-network
+    mem_limit: 800m
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-p${MYSQL_ROOT_PASSWORD}"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   api:
     build:
@@ -26,45 +36,50 @@ services:
       dockerfile: Dockerfile
     container_name: learnly_api
     restart: unless-stopped
-    ports:
-      - "4000:4000"
+    env_file: .env.production
     environment:
-      - NODE_ENV=production
-      - PORT=4000
-      - DATABASE_URL=mysql://root:learnly_root@mysql:3306/learnly
-      - JWT_ACCESS_SECRET=ini_secret_access_token_minimal_32_karakter_yang_panjang
-      - JWT_REFRESH_SECRET=ini_secret_refresh_token_minimal_32_karakter_yang_panjang
-      - CORS_ORIGIN=http://localhost:3000
-      - STORAGE_DRIVER=local
+      NODE_ENV: production
+      PORT: 5000
+      DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@learnly_db:3306/${MYSQL_DATABASE}
+    volumes:
+      - learnly_uploads:/app/uploads
     depends_on:
       mysql:
         condition: service_healthy
     networks:
-      - learnly_network
+      - learnly-network
+      - proxy
+    mem_limit: 350m
 
   web:
     build:
       context: ./web
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_BASE_URL: /api/v1
-        API_PROXY_TARGET: http://api:4000
+        API_PROXY_TARGET: http://learnly_api:5000
     container_name: learnly_web
     restart: unless-stopped
-    ports:
-      - "3000:3000"
     environment:
-      - NODE_ENV=production
-      - NEXT_PUBLIC_API_BASE_URL=/api/v1
-      - API_PROXY_TARGET=http://api:4000
+      NODE_ENV: production
+      PORT: 3000
+      NEXT_PUBLIC_API_BASE_URL: /api/v1
+      API_PROXY_TARGET: http://learnly_api:5000
+      NEXT_PUBLIC_MAP_TILE_URL: https://tile.openstreetmap.org/{z}/{x}/{y}.png
     depends_on:
       - api
     networks:
-      - learnly_network
+      - learnly-network
+      - proxy
+    mem_limit: 300m
 
 volumes:
-  learnly_mysql_data:
+  mysql_data:
+    name: learnly_mysql_data
+  learnly_uploads:
+    name: learnly_uploads_data
 
 networks:
-  learnly_network:
+  learnly-network:
     driver: bridge
+  proxy:
+    external: true
